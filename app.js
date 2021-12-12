@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 //'REQUIRE' ROUTES HERE
+//Perform authentication using Firebase token
 
 const app = express();
 app.use(bodyParser.json({ limit: "50mb" }));
