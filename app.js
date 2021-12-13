@@ -45,6 +45,7 @@ mongoose
     io.on("connection", (socket) => {
       console.log(`Connected: ${socket.id}`);
       socket.on("disconnect", () => console.log(`Disconnected: ${socket.id}`));
+      socket.on("msg", () => console.log(`Msg: ${socket.id}`));
       socket.on("join", (room) => {
         console.log(`Socket ${socket.id} joining ${room}`);
         socket.join(room);
