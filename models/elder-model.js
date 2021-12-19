@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const elderSchema = new Schema({
   phoneNumber: {
-    type: String,
+    type: Number,
     required: true,
   },
   firstName: {
@@ -21,22 +21,22 @@ const elderSchema = new Schema({
   },
   document: {
     type: String,
-    required: true,
+    // required: true,
   },
   profilePicture: {
     type: String,
   },
   birthDay: {
     type: Number,
-    required: true,
+    // required: true,
   },
   birthMonth: {
     type: Number,
-    required: true,
+    // required: true,
   },
   birthYear: {
     type: Number,
-    required: true,
+    // required: true,
   },
   language: {
     type: String,
@@ -44,17 +44,18 @@ const elderSchema = new Schema({
   },
   longitude: {
     type: String,
-    required: true,
+    // required: true,
   },
   latitude: {
     type: String,
-    required: true,
+    // required: true,
   },
   friends: [
     {
       type: Schema.Types.ObjectId,
       friendType: String,
       refPath: "friendType",
+      // ref: "Elder"
     },
   ],
   interests: [

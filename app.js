@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 //Perform authentication using Firebase token
 
 const app = express();
+const usersRoutes = require('./routes/userRoutes');
 app.use(bodyParser.json({ limit: "50mb" }));
 
 app.use((req, res, next) => {
@@ -21,9 +22,7 @@ app.use((req, res, next) => {
 
 //'USE' ROUTES HERE
 
-app.use("/", (req, res, next) => {
-  console.log("No match found.");
-});
+app.use("/", usersRoutes);
 
 app.use((error, req, res, next) => {
   if (res.headersSent) {
@@ -34,6 +33,7 @@ app.use((error, req, res, next) => {
 });
 
 //BELOW CODE IS FOR SOCKET.IO AND CHATTING
+
 mongoose
   .connect(
     "mongodb+srv://rushit:never-too-old-project-test@cluster0.w1zfz.mongodb.net/never-too-old-db?retryWrites=true&w=majority"
