@@ -49,6 +49,7 @@ mongoose
 
       //Send message to only a particular user
       socket.on('send_message', message => {
+        message = JSON.parse(message);
         timestamp = message.timestamp
         message = message.message
         senderChatID = message.senderChatID
