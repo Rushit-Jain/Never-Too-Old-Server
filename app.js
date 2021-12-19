@@ -43,18 +43,28 @@ mongoose
 
     const io = require("./socket").initServer(server);
     io.on("connection", (socket) => {
+      chatId = socket.handshake.headers.userid;
+      console.log(chatId);
+      socket.join(chatId);
+
+      //Send message to only a particular user
+      socket.on('send_message', message => {
+        timestamp = message.timestamp
+        message = message.message
+        senderChatID = message.senderChatID
+        receiverChatID = message.receiverChatID
+
+        //Send message to only that particular room
+        socket.in(receiverChatID).emit('receive_message', {
+          'timestamp': timestamp,
+          'message': message,
+          'senderChatID': senderChatID,
+          'receiverChatID': receiverChatID,
+        })
+      })
       console.log(`Connected: ${socket.id}`);
       socket.on("disconnect", () => console.log(`Disconnected: ${socket.id}`));
       socket.on("msg", () => console.log(`Msg: ${socket.id}`));
-      socket.on("join", (room) => {
-        console.log(`Socket ${socket.id} joining ${room}`);
-        socket.join(room);
-      });
-      socket.on("chat", (data) => {
-        const { message, room } = data;
-        console.log(`msg: ${message}, room: ${room}`);
-        socket.broadcast.to(room).emit("chat", message);
-      });
     });
   })
   .catch((err) => console.log(err));

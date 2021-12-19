@@ -11,13 +11,13 @@ const messageSchema = new Schema({
     type: String,
     required: true,
   },
-  userType: String,
-  senderUsername: {
+  // userType: String,
+  sendenId: {
     type: Schema.Types.ObjectId,
     refPath: "userType",
     required: true,
   },
-  receiverUsername: {
+  receiverId: {
     type: Schema.Types.ObjectId,
     refPath: "userType",
     required: true,
