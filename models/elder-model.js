@@ -53,9 +53,17 @@ const elderSchema = new Schema({
   friends: [
     {
       type: Schema.Types.ObjectId,
-      friendType: String,
-      refPath: "friendType",
-      // ref: "Elder"
+      // friendType: String,
+      // refPath: "friendType",
+      ref: "Elder"
+    },
+  ],
+  volunteers: [
+    {
+      type: Schema.Types.ObjectId,
+      // friendType: String,
+      // refPath: "friendType",
+      ref: "Volunteer"
     },
   ],
   interests: [

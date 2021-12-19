@@ -4,6 +4,7 @@
 const mongoose = require("mongoose");
 const HttpError = require('../models/http-error');
 const Elder = require('../models/elder-model');
+const Volunteer = require('../models/volunteer-model');
 
 const checkUser = async (req, res, next) => {
   // const errors = validationResult(req);
@@ -38,7 +39,7 @@ const checkUser = async (req, res, next) => {
       //   'User exists already, please login instead.',
       //   422
       // );
-      friendsdata = await Elder.find({ phoneNumber: req.body.number }, { friends: 1, _id: 0 }).populate("friends");
+      friendsdata = await Elder.find({ phoneNumber: req.body.number }, { friends: 1, _id: 0, volunteers: 1 }).populate([{ path: "friends", select: ['phoneNumber', 'firstName', 'lastName', 'profilePicture'] }, { path: "volunteers", select: ['phoneNumber', 'firstName', 'lastName', 'profilePicture'] }]);
       console.log(existingUser);
       present = "true";
       // return next(error);
@@ -78,6 +79,7 @@ const saveUser = async (req, res, next) => {
     longitude: "cdnkjc",
     latitude: "ndjncj",
     friends: [],
+    volunteers: [],
     interests: [],
     groups: [],
     emergencyContacts: ['7506432454', '9892283930']
