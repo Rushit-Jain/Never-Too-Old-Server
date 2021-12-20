@@ -57,6 +57,7 @@ mongoose
         message = messageData.text;
         senderChatID = messageData.senderChatID;
         receiverChatID = messageData.receiverChatID;
+        senderName = messageData.senderFirstName + message.senderLastName;
         console.log(receiverChatID);
         //Send message to only that particular room
         // socket.broadcast.emit("test", "test");
@@ -67,6 +68,7 @@ mongoose
             message: message,
             senderChatID: senderChatID,
             receiverChatID: receiverChatID,
+            senderName: senderName,
           })
         );
         // console.log("hi");
