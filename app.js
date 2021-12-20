@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 //Perform authentication using Firebase token
 
 const app = express();
-const usersRoutes = require('./routes/userRoutes');
+const usersRoutes = require("./routes/userRoutes");
 app.use(bodyParser.json({ limit: "50mb" }));
 
 app.use((req, res, next) => {
@@ -44,25 +44,31 @@ mongoose
     const io = require("./socket").initServer(server);
     io.on("connection", (socket) => {
       chatId = socket.handshake.headers.userid;
-      console.log(chatId);
       socket.join(chatId);
 
       //Send message to only a particular user
-      socket.on('send_message', message => {
-        message = JSON.parse(message);
-        timestamp = message.timestamp
-        message = message.message
-        senderChatID = message.senderChatID
-        receiverChatID = message.receiverChatID
 
+      socket.on("send_message", (messageData) => {
+        // console.log(message);
+        messageData = JSON.parse(messageData);
+        timestamp = messageData.timestamp;
+        message = messageData.text;
+        senderChatID = messageData.senderChatID;
+        receiverChatID = messageData.receiverChatID;
+        console.log(receiverChatID);
         //Send message to only that particular room
-        socket.in(receiverChatID).emit('receive_message', {
-          'timestamp': timestamp,
-          'message': message,
-          'senderChatID': senderChatID,
-          'receiverChatID': receiverChatID,
-        })
-      })
+        // socket.broadcast.emit("test", "test");
+        socket.to(receiverChatID).emit(
+          "receive_message",
+          JSON.stringify({
+            timestamp: timestamp,
+            message: message,
+            senderChatID: senderChatID,
+            receiverChatID: receiverChatID,
+          })
+        );
+        // console.log("hi");
+      });
       console.log(`Connected: ${socket.id}`);
       socket.on("disconnect", () => console.log(`Disconnected: ${socket.id}`));
       socket.on("msg", () => console.log(`Msg: ${socket.id}`));
