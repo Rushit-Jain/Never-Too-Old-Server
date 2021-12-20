@@ -5,12 +5,12 @@ const usersController = require('../controller/users-controllers');
 
 const router = express.Router();
 // router.get('/', usersController.getUsers);
-router.post('/gu', usersController.getUser);
+// router.post('/gu', usersController.getUser);
 router.post(
-  '/cu',
+  '/check',
   usersController.checkUser
 );
 
-router.post('/su', usersController.saveUser);
+router.post('/save', usersController.saveUser);
 
 module.exports = router;
