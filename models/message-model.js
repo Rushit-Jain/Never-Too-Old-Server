@@ -12,14 +12,14 @@ const messageSchema = new Schema({
     required: true,
   },
   // userType: String,
-  sendenId: {
+  senderChatID: {
     type: Schema.Types.ObjectId,
-    refPath: "userType",
+    // refPath: "userType",
     required: true,
   },
-  receiverId: {
+  receiverChatID: {
     type: Schema.Types.ObjectId,
-    refPath: "userType",
+    // refPath: "userType",
     required: true,
   },
 });

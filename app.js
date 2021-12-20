@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 
 const app = express();
 const usersRoutes = require("./routes/userRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 app.use(bodyParser.json({ limit: "50mb" }));
 
 app.use((req, res, next) => {
@@ -22,7 +23,8 @@ app.use((req, res, next) => {
 
 //'USE' ROUTES HERE
 
-app.use("/", usersRoutes);
+app.use("/users", usersRoutes);
+app.use("/messages", messageRoutes);
 
 app.use((error, req, res, next) => {
   if (res.headersSent) {
