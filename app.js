@@ -46,10 +46,32 @@ mongoose
     const io = require("./socket").initServer(server);
     io.on("connection", (socket) => {
       chatId = socket.handshake.headers.userid;
+      console.log("mcdmmkmrjjrvnjv j vfv jvnrjnvrjnvrjnrjnvfrj" + socket.handshake.headers.groupIDs);
+      // if (socket.handshake.headers.groupIDs) {
+      //   socket.handshake.headers.groupIDs.forEach(element => {
+      //     console.log("uhduhuhuehudbdbfubybyeybdyhb" + element);
+      //     socket.join(element);
+      //   });
+      // }
       socket.join(chatId);
 
-      //Send message to only a particular user
+      socket.on("joining_group_room", (jsonData) => {
+        jsonData = JSON.parse(jsonData);
+        console.log("uhduhuhuehudbdbfubybyeybdyhb" + jsonData);
+        jsonData.groupIDs.forEach(element => {
+          socket.join(element);
+        })
+      });
+      socket.on("join_all_groups", (groupIDs) => {
+        groupIDs = JSON.parse(groupIDs);
+        console.log("uhduhuhuehudbdbfubybyeybdyhb77777777777777777777777777777777777" + groupIDs);
+        console.log(groupIDs);
+        groupIDs.groupIDs.forEach(element => {
+          socket.join(element);
+        });
+      });
 
+      //Send message to only a particular user
       socket.on("send_message", (messageData) => {
         // console.log(message);
         messageData = JSON.parse(messageData);
@@ -57,7 +79,7 @@ mongoose
         message = messageData.text;
         senderChatID = messageData.senderChatID;
         receiverChatID = messageData.receiverChatID;
-        senderName = messageData.senderFirstName + message.senderLastName;
+        senderName = messageData.senderFirstName + " " + messageData.senderLastName;
         console.log(receiverChatID);
         //Send message to only that particular room
         // socket.broadcast.emit("test", "test");
@@ -73,9 +95,38 @@ mongoose
         );
         // console.log("hi");
       });
+      socket.on("creating_group", (newGroupData) => {
+        // console.log(message);
+        newGroupData = JSON.parse(newGroupData);
+        console.log(newGroupData);
+        _id = newGroupData._id;
+        groupName = newGroupData.groupName;
+        timestamp = newGroupData.timestamp;
+        memberChatIDs = newGroupData.memberChatIDs;
+        creatorChatID = newGroupData.receiverChatID;
+        console.log(memberChatIDs);
+        //Send message to only that particular room
+        // socket.broadcast.emit("test", "test");
+        console.log();
+        socket.join(_id);
+        console.log("fmkmikmnkdnknjnjnfjnuddddddddddddddddddddddddddddddddddddddddd");
+        memberChatIDs.forEach(element => {
+          console.log(element);
+          socket.to(element).emit(
+            "inviting_to_group",
+            JSON.stringify({
+              timestamp: timestamp,
+              message: "You Are Added",
+              groupName: groupName,
+              _id: _id,
+              memberChatIDs: memberChatIDs,
+              creatorChatID: creatorChatID,
+            })
+          );
+        });
+      });
       console.log(`Connected: ${socket.id}`);
       socket.on("disconnect", () => console.log(`Disconnected: ${socket.id}`));
-      socket.on("msg", () => console.log(`Msg: ${socket.id}`));
     });
   })
   .catch((err) => console.log(err));

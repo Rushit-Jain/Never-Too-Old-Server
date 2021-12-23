@@ -1,24 +1,14 @@
-// const { validationResult } = require('express-validator');
-// const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken');
 const mongoose = require("mongoose");
 const HttpError = require('../models/http-error');
 const Elder = require('../models/elder-model');
 const Volunteer = require('../models/volunteer-model');
 
 const checkUser = async (req, res, next) => {
-  // const errors = validationResult(req);
-  // console.log(errors);
-  // if (!errors.isEmpty()) {
-  //   return next(
-  //     new HttpError('Invalid inputs passed, please check your data.', 422)
-  //   );
-  // }
-  // req.body = JSON.parse(req.body);
+
   console.log(req.body);
   let existingUser;
   try {
-    existingUser = await Elder.findOne({ phoneNumber: req.body.number }, { friends: 0 });
+    existingUser = await Elder.findOne({ phoneNumber: req.body.number }, { friends: 0, groups: 0 });
   } catch (err) {
     // const error = new HttpError(
     //   'Signing up failed, please try again later.',
@@ -40,13 +30,14 @@ const checkUser = async (req, res, next) => {
       //   422
       // );
       friendsdata = await Elder.find({ phoneNumber: req.body.number }, { friends: 1, _id: 0, volunteers: 1 }).populate([{ path: "friends", select: ['phoneNumber', 'firstName', 'lastName', 'profilePicture'] }, { path: "volunteers", select: ['phoneNumber', 'firstName', 'lastName', 'profilePicture'] }]);
+      groupsdata = await Elder.find({ phoneNumber: req.body.number }, { groups: 1, _id: 0 })
       console.log(existingUser);
       present = "true";
       // return next(error);
     }
     res
       .status(201)
-      .json({ "present": present, existingUser, friendsdata });
+      .json({ "present": present, existingUser, friendsdata, groupsdata });
   } catch (err) {
     console.log(err);
   }
@@ -115,7 +106,29 @@ const getUser = async (req, res, next) => {
 
 
 };
+const insertNewGroup = async (req, res, next) => {
+  console.log(req.body);
+  try {
+    let newGroup = { "timestamp": req.body.timestamp, "groupName": req.body.groupName, "memberChatIDs": [req.body.creatorChatID, ...req.body.memberChatIDs] };
+    let addNewGroup = await Elder.updateMany({ "_id": { $in: [...req.body.memberChatIDs, req.body.creatorChatID] } }, { $push: { "groups": newGroup } });
+    let existingUser = await Elder.findById(req.body.creatorChatID);
+    existingUser.groups.sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp));
+    // console.log(existingUser.groups);
+    res
+      .status(201)
+      .json(existingUser.groups[0]);
+  } catch (err) {
+    const error = new HttpError(
+      'Signing up failed, please try again later.',
+      500
+    );
+    return next(error);
+  }
+
+
+};
 
 exports.getUser = getUser;
 exports.saveUser = saveUser;
 exports.checkUser = checkUser;
+exports.insertNewGroup = insertNewGroup;

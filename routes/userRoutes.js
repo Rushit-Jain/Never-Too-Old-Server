@@ -12,5 +12,6 @@ router.post(
 );
 
 router.post('/save', usersController.saveUser);
+router.post('/insertNewGroup', usersController.insertNewGroup);
 
 module.exports = router;

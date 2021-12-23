@@ -20,18 +20,29 @@ exports.saveMessages = async (req, res, next) => {
 
 exports.getMessages = async (req, res, next) => {
   try {
+    var messages;
     console.log(req.query.senderChatID);
+    console.log(req.query.receiverChatID);
     const userId1 = req.query.senderChatID;
     const userId2 = req.query.receiverChatID;
-    const messages1 = await Message.find({
-      senderChatID: userId1,
-      receiverChatID: userId2,
-    });
-    const messages2 = await Message.find({
-      senderChatID: userId2,
-      receiverChatID: userId1,
-    });
-    const messages = [...messages1, ...messages2];
+    const isSingleChat = req.query.isSingleChat;
+    console.log(isSingleChat);
+    if (isSingleChat == "true") {
+      const messages1 = await Message.find({
+        senderChatID: userId1,
+        receiverChatID: userId2,
+      });
+      const messages2 = await Message.find({
+        senderChatID: userId2,
+        receiverChatID: userId1,
+      });
+      messages = [...messages1, ...messages2];
+    }
+    else {
+      messages = await Message.find({
+        receiverChatID: userId2,
+      });
+    }
     messages.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
     console.log(messages);
     res.json(messages);
