@@ -73,7 +73,11 @@ const elderSchema = new Schema({
   ],
   groups: [
     {
-      type: String,
+      timestamp: { type: String },
+      groupName: { type: String },
+      memberChatIDs: [{}],
+      // memberChatIDs: [{ _id: { type: Schema.ObjectId } }]
+      // type: String,
     },
   ],
   emergencyContacts: [
