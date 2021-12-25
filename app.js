@@ -71,6 +71,19 @@ mongoose
         });
       });
 
+      socket.on("video_call_invite", (jsonData) => {
+        jsonData = JSON.parse(jsonData);
+        console.log("11111111111111111111111111111111111111111111111111111111111111111111111" + jsonData.receiverChatID);
+        receiverChatID = jsonData.receiverChatID;
+        videocall_roomID = jsonData.videocall_roomID;
+        socket.to(receiverChatID).emit(
+          "join_call",
+          JSON.stringify({
+            videocall_roomID: videocall_roomID,
+
+          })
+        )
+      });
       //Send message to only a particular user
       socket.on("send_message", (messageData) => {
         // console.log(message);
