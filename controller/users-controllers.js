@@ -1,48 +1,62 @@
 const mongoose = require("mongoose");
-const HttpError = require('../models/http-error');
-const Elder = require('../models/elder-model');
-const Volunteer = require('../models/volunteer-model');
+const HttpError = require("../models/http-error");
+const Elder = require("../models/elder-model");
+const Volunteer = require("../models/volunteer-model");
 
 const checkUser = async (req, res, next) => {
-
   console.log(req.body);
   let existingUser;
   try {
-    existingUser = await Elder.findOne({ phoneNumber: req.body.number }, { friends: 0, groups: 0 });
+    existingUser = await Elder.findOne(
+      { phoneNumber: req.body.number },
+      { friends: 0, groups: 0 }
+    );
   } catch (err) {
     // const error = new HttpError(
     //   'Signing up failed, please try again later.',
     //   500
     // );
     // return next(error);
-    res
-      .status(201)
-      .json({ "present": "false" });
+    res.status(201).json({ present: "false" });
     return;
   }
 
   let present = "false";
-  let friendsdata;
+  let friendsdata, groupsdata;
   try {
     if (existingUser) {
       // const error = new HttpError(
       //   'User exists already, please login instead.',
       //   422
       // );
-      friendsdata = await Elder.find({ phoneNumber: req.body.number }, { friends: 1, _id: 0, volunteers: 1 }).populate([{ path: "friends", select: ['phoneNumber', 'firstName', 'lastName', 'profilePicture'] }, { path: "volunteers", select: ['phoneNumber', 'firstName', 'lastName', 'profilePicture'] }]);
-      groupsdata = await Elder.find({ phoneNumber: req.body.number }, { groups: 1, _id: 0 })
+      friendsdata = await Elder.find(
+        { phoneNumber: req.body.number },
+        { friends: 1, _id: 0, volunteers: 1 }
+      ).populate([
+        {
+          path: "friends",
+          select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
+        },
+        {
+          path: "volunteers",
+          select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
+        },
+      ]);
+      groupsdata = await Elder.find(
+        { phoneNumber: req.body.number },
+        { groups: 1, _id: 0 }
+      );
       console.log(existingUser);
       present = "true";
       // return next(error);
     }
     res
       .status(201)
-      .json({ "present": present, existingUser, friendsdata, groupsdata });
+      .json({ present: present, existingUser, friendsdata, groupsdata });
   } catch (err) {
     console.log(err);
   }
-
-}
+};
 
 const saveUser = async (req, res, next) => {
   // const errors = validationResult(req);
@@ -73,19 +87,17 @@ const saveUser = async (req, res, next) => {
     volunteers: [],
     interests: [],
     groups: [],
-    emergencyContacts: ['7506432454', '9892283930']
+    emergencyContacts: ["7506432454", "9892283930"],
   });
   try {
     console.log(typeof createdUser);
-    createdUser.save().then(result => console.log(result)).catch(err => console.log(err));
-    res
-      .status(201)
-      .json(createdUser);
+    createdUser
+      .save()
+      .then((result) => console.log(result))
+      .catch((err) => console.log(err));
+    res.status(201).json(createdUser);
   } catch (err) {
-    const error = new HttpError(
-      'User Creation Failed.29',
-      500
-    );
+    const error = new HttpError("User Creation Failed.29", 500);
     return next(error);
   }
 };
@@ -93,39 +105,40 @@ const getUser = async (req, res, next) => {
   console.log(req.body);
   try {
     let existingUser = await Elder.findOne({ phoneNumber: req.body.number });
-    res
-      .status(201)
-      .json(existingUser);
+    res.status(201).json(existingUser);
   } catch (err) {
     const error = new HttpError(
-      'Signing up failed, please try again later.',
+      "Signing up failed, please try again later.",
       500
     );
     return next(error);
   }
-
-
 };
 const insertNewGroup = async (req, res, next) => {
   console.log(req.body);
   try {
-    let newGroup = { "timestamp": req.body.timestamp, "groupName": req.body.groupName, "memberChatIDs": [req.body.creatorChatID, ...req.body.memberChatIDs] };
-    let addNewGroup = await Elder.updateMany({ "_id": { $in: [...req.body.memberChatIDs, req.body.creatorChatID] } }, { $push: { "groups": newGroup } });
+    let newGroup = {
+      timestamp: req.body.timestamp,
+      groupName: req.body.groupName,
+      memberChatIDs: [req.body.creatorChatID, ...req.body.memberChatIDs],
+    };
+    let addNewGroup = await Elder.updateMany(
+      { _id: { $in: [...req.body.memberChatIDs, req.body.creatorChatID] } },
+      { $push: { groups: newGroup } }
+    );
     let existingUser = await Elder.findById(req.body.creatorChatID);
-    existingUser.groups.sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp));
+    existingUser.groups.sort(
+      (a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp)
+    );
     // console.log(existingUser.groups);
-    res
-      .status(201)
-      .json(existingUser.groups[0]);
+    res.status(201).json(existingUser.groups[0]);
   } catch (err) {
     const error = new HttpError(
-      'Signing up failed, please try again later.',
+      "Signing up failed, please try again later.",
       500
     );
     return next(error);
   }
-
-
 };
 
 exports.getUser = getUser;
