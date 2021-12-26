@@ -46,7 +46,10 @@ mongoose
     const io = require("./socket").initServer(server);
     io.on("connection", (socket) => {
       chatId = socket.handshake.headers.userid;
-      console.log("mcdmmkmrjjrvnjv j vfv jvnrjnvrjnvrjnrjnvfrj" + socket.handshake.headers.groupIDs);
+      console.log(
+        "mcdmmkmrjjrvnjv j vfv jvnrjnvrjnvrjnrjnvfrj" +
+          socket.handshake.headers.groupIDs
+      );
       // if (socket.handshake.headers.groupIDs) {
       //   socket.handshake.headers.groupIDs.forEach(element => {
       //     console.log("uhduhuhuehudbdbfubybyeybdyhb" + element);
@@ -58,31 +61,51 @@ mongoose
       socket.on("joining_group_room", (jsonData) => {
         jsonData = JSON.parse(jsonData);
         console.log("uhduhuhuehudbdbfubybyeybdyhb" + jsonData);
-        jsonData.groupIDs.forEach(element => {
+        jsonData.groupIDs.forEach((element) => {
           socket.join(element);
-        })
+        });
       });
+
       socket.on("join_all_groups", (groupIDs) => {
         groupIDs = JSON.parse(groupIDs);
-        console.log("uhduhuhuehudbdbfubybyeybdyhb77777777777777777777777777777777777" + groupIDs);
+        console.log(
+          "uhduhuhuehudbdbfubybyeybdyhb77777777777777777777777777777777777" +
+            groupIDs
+        );
         console.log(groupIDs);
-        groupIDs.groupIDs.forEach(element => {
+        groupIDs.groupIDs.forEach((element) => {
           socket.join(element);
         });
       });
 
       socket.on("video_call_invite", (jsonData) => {
         jsonData = JSON.parse(jsonData);
-        console.log("11111111111111111111111111111111111111111111111111111111111111111111111" + jsonData.receiverChatID);
+        // console.log(
+        //   "11111111111111111111111111111111111111111111111111111111111111111111111" +
+        //     jsonData.receiverChatID
+        // );
         receiverChatID = jsonData.receiverChatID;
+        senderChatID = jsonData.senderChatID;
         videocall_roomID = jsonData.videocall_roomID;
         socket.to(receiverChatID).emit(
           "join_call",
           JSON.stringify({
             videocall_roomID: videocall_roomID,
-
+            senderChatID: senderChatID,
           })
-        )
+        );
+      });
+      socket.on("video_call_end", (jsonData) => {
+        jsonData = JSON.parse(jsonData);
+        receiverChatID = jsonData.receiverChatID;
+        videocall_roomID = jsonData.videocall_roomID;
+        console.log("CHECKKKKKKKKKKKKKKKKKKKKKKKKKKKKK" + receiverChatID);
+        socket.to(receiverChatID).emit(
+          "end_call",
+          JSON.stringify({
+            videocall_roomID: videocall_roomID,
+          })
+        );
       });
       //Send message to only a particular user
       socket.on("send_message", (messageData) => {
@@ -92,7 +115,8 @@ mongoose
         message = messageData.text;
         senderChatID = messageData.senderChatID;
         receiverChatID = messageData.receiverChatID;
-        senderName = messageData.senderFirstName + " " + messageData.senderLastName;
+        senderName =
+          messageData.senderFirstName + " " + messageData.senderLastName;
         console.log(receiverChatID);
         //Send message to only that particular room
         // socket.broadcast.emit("test", "test");
@@ -122,8 +146,10 @@ mongoose
         // socket.broadcast.emit("test", "test");
         console.log();
         socket.join(_id);
-        console.log("fmkmikmnkdnknjnjnfjnuddddddddddddddddddddddddddddddddddddddddd");
-        memberChatIDs.forEach(element => {
+        console.log(
+          "fmkmikmnkdnknjnjnfjnuddddddddddddddddddddddddddddddddddddddddd"
+        );
+        memberChatIDs.forEach((element) => {
           console.log(element);
           socket.to(element).emit(
             "inviting_to_group",
