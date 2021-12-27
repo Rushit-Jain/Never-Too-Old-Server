@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const app = express();
 const usersRoutes = require("./routes/userRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const callRoutes = require("./routes/callRoutes");
 app.use(bodyParser.json({ limit: "50mb" }));
 
 app.use((req, res, next) => {
@@ -23,6 +24,7 @@ app.use((req, res, next) => {
 
 //'USE' ROUTES HERE
 
+app.use("/call", callRoutes);
 app.use("/users", usersRoutes);
 app.use("/messages", messageRoutes);
 
@@ -48,7 +50,7 @@ mongoose
       chatId = socket.handshake.headers.userid;
       console.log(
         "mcdmmkmrjjrvnjv j vfv jvnrjnvrjnvrjnrjnvfrj" +
-          socket.handshake.headers.groupIDs
+        socket.handshake.headers.groupIDs
       );
       // if (socket.handshake.headers.groupIDs) {
       //   socket.handshake.headers.groupIDs.forEach(element => {
@@ -70,7 +72,7 @@ mongoose
         groupIDs = JSON.parse(groupIDs);
         console.log(
           "uhduhuhuehudbdbfubybyeybdyhb77777777777777777777777777777777777" +
-            groupIDs
+          groupIDs
         );
         console.log(groupIDs);
         groupIDs.groupIDs.forEach((element) => {
