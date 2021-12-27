@@ -80,10 +80,6 @@ mongoose
 
       socket.on("video_call_invite", (jsonData) => {
         jsonData = JSON.parse(jsonData);
-        // console.log(
-        //   "11111111111111111111111111111111111111111111111111111111111111111111111" +
-        //     jsonData.receiverChatID
-        // );
         receiverChatID = jsonData.receiverChatID;
         senderChatID = jsonData.senderChatID;
         videocall_roomID = jsonData.videocall_roomID;
@@ -99,7 +95,6 @@ mongoose
         jsonData = JSON.parse(jsonData);
         receiverChatID = jsonData.receiverChatID;
         videocall_roomID = jsonData.videocall_roomID;
-        console.log("CHECKKKKKKKKKKKKKKKKKKKKKKKKKKKKK" + receiverChatID);
         socket.to(receiverChatID).emit(
           "end_call",
           JSON.stringify({
@@ -107,6 +102,32 @@ mongoose
           })
         );
       });
+
+      socket.on("voice_call_invite", (jsonData) => {
+        jsonData = JSON.parse(jsonData);
+        receiverChatID = jsonData.receiverChatID;
+        senderChatID = jsonData.senderChatID;
+        voicecall_roomID = jsonData.voicecall_roomID;
+        socket.to(receiverChatID).emit(
+          "join_voice_call",
+          JSON.stringify({
+            voicecall_roomID: voicecall_roomID,
+            senderChatID: senderChatID,
+          })
+        );
+      });
+      socket.on("voice_call_end", (jsonData) => {
+        jsonData = JSON.parse(jsonData);
+        receiverChatID = jsonData.receiverChatID;
+        voicecall_roomID = jsonData.voicecall_roomID;
+        socket.to(receiverChatID).emit(
+          "end_voice_call",
+          JSON.stringify({
+            voicecall_roomID: voicecall_roomID,
+          })
+        );
+      });
+
       //Send message to only a particular user
       socket.on("send_message", (messageData) => {
         // console.log(message);
