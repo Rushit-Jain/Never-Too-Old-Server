@@ -84,12 +84,14 @@ mongoose
         jsonData = JSON.parse(jsonData);
         receiverChatID = jsonData.receiverChatID;
         senderChatID = jsonData.senderChatID;
+        senderName = jsonData.senderName;
         videocall_roomID = jsonData.videocall_roomID;
         socket.to(receiverChatID).emit(
           "join_call",
           JSON.stringify({
             videocall_roomID: videocall_roomID,
             senderChatID: senderChatID,
+            senderName: senderName
           })
         );
       });
@@ -104,17 +106,30 @@ mongoose
           })
         );
       });
+      socket.on("call_accepted", (jsonData) => {
+        jsonData = JSON.parse(jsonData);
+        senderChatID = jsonData.senderChatID;
+        console.log("call_accepted", senderChatID);
+        socket.to(senderChatID).emit(
+          "receiver_accepted_call",
+          JSON.stringify({
+            "accepted": true
+          })
+        );
+      });
 
       socket.on("voice_call_invite", (jsonData) => {
         jsonData = JSON.parse(jsonData);
         receiverChatID = jsonData.receiverChatID;
         senderChatID = jsonData.senderChatID;
+        senderName = jsonData.senderName;
         voicecall_roomID = jsonData.voicecall_roomID;
         socket.to(receiverChatID).emit(
           "join_voice_call",
           JSON.stringify({
             voicecall_roomID: voicecall_roomID,
             senderChatID: senderChatID,
+            senderName: senderName
           })
         );
       });
