@@ -114,6 +114,66 @@ const getUser = async (req, res, next) => {
     return next(error);
   }
 };
+const updateLocation = async (req, res, next) => {
+  console.log(req.body.coordinates[0]);
+  try {
+    let existingUser = await Elder.findOneAndUpdate({ phoneNumber: req.body.number }, { location: { "type": "Point", "coordinates": req.body.coordinates } });
+    console.log(existingUser.friends);
+    // let friendsID = [];
+    // for (var i = 0; i < ((existingUser.friends).length); i++) {
+    //   let idsplit = existingUser.friends.toString().split("\"")
+    //   friendsID.push(idsplit[1]);
+    // }
+    // let new_friends1 = await Elder.find({ _id: { $nin: [...existingUser.friends, existingUser._id] } });
+    // console.log(new_friends1);
+    let new_friends = await Elder.find({
+      _id: { $nin: [...existingUser.friends, existingUser._id] },
+      location: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [req.body.coordinates[0], req.body.coordinates[1]]
+          },
+          $maxDistance: 2000,
+          $minDistance: 0
+        }
+      }
+    }, { _id: 1, firstName: 1, lastName: 1 });
+    console.log(new_friends);
+    res.status(201).json({ new_friends: new_friends });
+  } catch (err) {
+    const error = new HttpError(
+      "Signing up failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+};
+const addNewFriend = async (req, res, next) => {
+  console.log(req.body);
+  try {
+    let existingUser = await Elder.findOneAndUpdate({ phoneNumber: req.body.number }, { $push: { friends: req.body.friendID } })
+    friendsdata = await Elder.find(
+      { phoneNumber: req.body.number },
+      { friends: 1, _id: 0 }
+    ).populate([
+      {
+        path: "friends",
+        select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
+      },
+    ]);
+    console.log(friendsdata);
+    res.status(201).json({ friendsdata });
+
+
+  } catch (err) {
+    const error = new HttpError(
+      "Signing up failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+};
 const insertNewGroup = async (req, res, next) => {
   console.log(req.body);
   try {
@@ -145,3 +205,5 @@ exports.getUser = getUser;
 exports.saveUser = saveUser;
 exports.checkUser = checkUser;
 exports.insertNewGroup = insertNewGroup;
+exports.updateLocation = updateLocation;
+exports.addNewFriend = addNewFriend;
