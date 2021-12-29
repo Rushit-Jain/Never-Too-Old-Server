@@ -12,6 +12,8 @@ router.post(
 );
 
 router.post('/save', usersController.saveUser);
+router.post('/updateLocation', usersController.updateLocation);
+router.post('/addNewFriend', usersController.addNewFriend);
 router.post('/insertNewGroup', usersController.insertNewGroup);
 
 module.exports = router;
