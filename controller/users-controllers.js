@@ -67,25 +67,25 @@ const saveUser = async (req, res, next) => {
   //   );
   // }
   // req.body = JSON.parse(Object.keys(req.body)[0]);
-  const { phoneNumber, fname, lname, gender, language } = req.body;
   console.log(req.body);
+  const { phoneNumber, fname, lname, gender, language, interests, document } =
+    req.body;
 
   const createdUser = new Elder({
     phoneNumber,
     firstName: fname,
     lastName: lname,
     gender: gender,
-    document: "enjd",
+    document: document,
     profilePicture: "wjdhwj",
     birthDay: "28",
     birthMonth: "11",
     birthYear: "2000",
     language: language,
-    longitude: "cdnkjc",
-    latitude: "ndjncj",
+    location: { type: "Point", coordinates: [72.0, 19.2] },
     friends: [],
     volunteers: [],
-    interests: [],
+    interests: interests,
     groups: [],
     emergencyContacts: ["7506432454", "9892283930"],
   });
@@ -95,6 +95,7 @@ const saveUser = async (req, res, next) => {
       .save()
       .then((result) => console.log(result))
       .catch((err) => console.log(err));
+    console.log("ssssssssssssssssssssss");
     res.status(201).json(createdUser);
   } catch (err) {
     const error = new HttpError("User Creation Failed.29", 500);
@@ -117,8 +118,11 @@ const getUser = async (req, res, next) => {
 const updateLocation = async (req, res, next) => {
   console.log(req.body.coordinates[0]);
   try {
-    let existingUser = await Elder.findOneAndUpdate({ phoneNumber: req.body.number }, { location: { "type": "Point", "coordinates": req.body.coordinates } });
-    console.log(existingUser.friends);
+    let existingUser = await Elder.findOneAndUpdate(
+      { phoneNumber: req.body.number },
+      { location: { type: "Point", coordinates: req.body.coordinates } }
+    );
+    console.log(existingUser.location.coordinates);
     // let friendsID = [];
     // for (var i = 0; i < ((existingUser.friends).length); i++) {
     //   let idsplit = existingUser.friends.toString().split("\"")
@@ -126,20 +130,49 @@ const updateLocation = async (req, res, next) => {
     // }
     // let new_friends1 = await Elder.find({ _id: { $nin: [...existingUser.friends, existingUser._id] } });
     // console.log(new_friends1);
-    let new_friends = await Elder.find({
-      _id: { $nin: [...existingUser.friends, existingUser._id] },
-      location: {
-        $near: {
-          $geometry: {
-            type: "Point",
-            coordinates: [req.body.coordinates[0], req.body.coordinates[1]]
+    let new_friends = await Elder.find(
+      {
+        _id: { $nin: [...existingUser.friends, existingUser._id] },
+        interests: { $ne: [] },
+        location: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [req.body.coordinates[0], req.body.coordinates[1]],
+            },
+            $maxDistance: 20000,
+            $minDistance: 0,
           },
-          $maxDistance: 2000,
-          $minDistance: 0
-        }
+        },
+      },
+      { _id: 1, firstName: 1, lastName: 1, interests: 1 }
+    );
+    console.log("ddddddddddddddddddddddd", new_friends);
+    var jaccard_indexes = [];
+    let interest = existingUser.interests;
+
+    for (var i = 0; i < new_friends.length; i++) {
+      if (new_friends[i].interests == []) continue;
+      let bitwiseandlist = [];
+      let bitwiseorlist = [];
+      console.log(new_friends[i].firstName, new_friends[i].interests);
+      for (var j = 0; j < 42; j++) {
+        intersection = interest[j] && new_friends[i].interests[j];
+        bitwiseandlist.push(intersection);
+        union = interest[i] || new_friends[i].interests[j];
+        bitwiseorlist.push(union);
       }
-    }, { _id: 1, firstName: 1, lastName: 1 });
-    console.log(new_friends);
+      var countOccurrences = (arr, val) =>
+        arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
+      let similarity =
+        countOccurrences(bitwiseandlist, true) /
+        countOccurrences(bitwiseorlist, true);
+      console.log(similarity);
+      jaccard_indexes.push(similarity);
+      new_friends[i].similarity = similarity;
+    }
+    new_friends.sort((a, b) => b.similarity - a.similarity);
+    console.log("sssssssssssssokodkdmk", new_friends);
     res.status(201).json({ new_friends: new_friends });
   } catch (err) {
     const error = new HttpError(
@@ -152,7 +185,10 @@ const updateLocation = async (req, res, next) => {
 const addNewFriend = async (req, res, next) => {
   console.log(req.body);
   try {
-    let existingUser = await Elder.findOneAndUpdate({ phoneNumber: req.body.number }, { $push: { friends: req.body.friendID } })
+    let existingUser = await Elder.findOneAndUpdate(
+      { phoneNumber: req.body.number },
+      { $push: { friends: req.body.friendID } }
+    );
     friendsdata = await Elder.find(
       { phoneNumber: req.body.number },
       { friends: 1, _id: 0 }
@@ -164,8 +200,6 @@ const addNewFriend = async (req, res, next) => {
     ]);
     console.log(friendsdata);
     res.status(201).json({ friendsdata });
-
-
   } catch (err) {
     const error = new HttpError(
       "Signing up failed, please try again later.",
