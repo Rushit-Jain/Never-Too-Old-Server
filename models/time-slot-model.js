@@ -3,36 +3,32 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const timeSlotSchema = new Schema({
-  creator: {
+  elder: {
     type: Schema.Types.ObjectId,
-    required: true,
-    refPath: "creatorType",
+    ref: "Elder"
   },
-  acceptor: {
+  volunteer: {
     type: Schema.Types.ObjectId,
-    required: true,
-    refPath: "acceptorType",
+    ref: "Vounteer"
   },
-  creatorType: String,
-  acceptorType: String,
   startTime: {
     type: String,
     required: true,
   },
   endTime: {
     type: String,
-    required: true,
+    // required: true,
   },
   date: {
     type: String,
     required: true,
   },
-  slotType: {
+  meetType: {
     type: String,
     required: true,
   },
   acceptanceStatus: {
-    type: String,
+    type: Boolean,
     required: true,
   },
 });
