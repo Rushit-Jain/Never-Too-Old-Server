@@ -42,25 +42,20 @@ const volunteerSchema = new Schema({
     type: String,
     required: true,
   },
-  longitude: {
-    type: String,
-    // required: true,
-  },
-  latitude: {
-    type: String,
-    // required: true,
-  },
-  friends: [
+  location: {
+    type: {
+      type: String, // Don't do `{ location: { type: String } }`
+      enum: ['Point'], // 'location.type' must be 'Point'
+      // required: true
+    },
+    coordinates: {
+      type: [Number],
+      // required: true
+    }
+  }, elders: [
     {
       type: Schema.Types.ObjectId,
-      friendType: String,
-      refPath: "friendType",
-      // ref: "Elder"
-    },
-  ],
-  interests: [
-    {
-      type: String,
+      ref: "Elder"
     },
   ],
   groups: [
@@ -68,11 +63,7 @@ const volunteerSchema = new Schema({
       type: String,
     },
   ],
-  emergencyContacts: [
-    {
-      type: String,
-    },
-  ],
+
 });
 
 module.exports = mongoose.model("Volunteer", volunteerSchema);

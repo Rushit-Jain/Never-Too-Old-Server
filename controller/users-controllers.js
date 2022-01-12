@@ -42,6 +42,7 @@ const checkUser = async (req, res, next) => {
           select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
         },
       ]);
+      console.log(friendsdata);
       groupsdata = await Elder.find(
         { phoneNumber: req.body.number },
         { groups: 1, _id: 0 }

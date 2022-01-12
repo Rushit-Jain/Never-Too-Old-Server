@@ -10,6 +10,7 @@ const usersRoutes = require("./routes/userRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const meetRoutes = require("./routes/meetRoutes");
 const callRoutes = require("./routes/callRoutes");
+const volunteerRoutes = require("./routes/volunteerRoutes");
 app.use(bodyParser.json({ limit: "50mb" }));
 
 app.use((req, res, next) => {
@@ -29,6 +30,7 @@ app.use("/call", callRoutes);
 app.use("/users", usersRoutes);
 app.use("/messages", messageRoutes);
 app.use("/meet", meetRoutes);
+app.use("/volunteer", volunteerRoutes);
 
 app.use((error, req, res, next) => {
   if (res.headersSent) {
