@@ -69,8 +69,16 @@ const saveUser = async (req, res, next) => {
   // }
   // req.body = JSON.parse(Object.keys(req.body)[0]);
   console.log(req.body);
-  const { phoneNumber, fname, lname, gender, language, interests, document } =
-    req.body;
+  const {
+    phoneNumber,
+    fname,
+    lname,
+    gender,
+    language,
+    interests,
+    document,
+    emergencyContacts,
+  } = req.body;
 
   const createdUser = new Elder({
     phoneNumber,
@@ -88,7 +96,7 @@ const saveUser = async (req, res, next) => {
     volunteers: [],
     interests: interests,
     groups: [],
-    emergencyContacts: ["7506432454", "9892283930"],
+    emergencyContacts: emergencyContacts,
   });
   try {
     console.log(typeof createdUser);
@@ -103,6 +111,7 @@ const saveUser = async (req, res, next) => {
     return next(error);
   }
 };
+
 const getUser = async (req, res, next) => {
   console.log(req.body);
   try {
@@ -116,6 +125,7 @@ const getUser = async (req, res, next) => {
     return next(error);
   }
 };
+
 const updateLocation = async (req, res, next) => {
   console.log(req.body.coordinates[0]);
   try {
@@ -148,6 +158,25 @@ const updateLocation = async (req, res, next) => {
       },
       { _id: 1, firstName: 1, lastName: 1, interests: 1 }
     );
+
+    let new_volunteers = await Volunteer.find(
+      {
+        _id: { $nin: [...existingUser.volunteers] },
+        location: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [req.body.coordinates[0], req.body.coordinates[1]],
+            },
+            $maxDistance: 20000,
+            $minDistance: 0,
+          },
+        },
+      },
+      { _id: 1, firstName: 1, lastName: 1 }
+    );
+    console.log("HEY there" + new_volunteers);
+
     console.log("ddddddddddddddddddddddd", new_friends);
     var jaccard_indexes = [];
     let interest = existingUser.interests;
@@ -174,7 +203,9 @@ const updateLocation = async (req, res, next) => {
     }
     new_friends.sort((a, b) => b.similarity - a.similarity);
     console.log("sssssssssssssokodkdmk", new_friends);
-    res.status(201).json({ new_friends: new_friends });
+    res
+      .status(201)
+      .json({ new_friends: new_friends, new_volunteers: new_volunteers });
   } catch (err) {
     const error = new HttpError(
       "Signing up failed, please try again later.",
@@ -183,6 +214,7 @@ const updateLocation = async (req, res, next) => {
     return next(error);
   }
 };
+
 const addNewFriend = async (req, res, next) => {
   console.log(req.body);
   try {
@@ -199,8 +231,10 @@ const addNewFriend = async (req, res, next) => {
         select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
       },
     ]);
-    console.log(friendsdata);
     res.status(201).json({ friendsdata });
+    await Elder.findByIdAndUpdate(req.body.friendID, {
+      $push: { friends: existingUser._id },
+    });
   } catch (err) {
     const error = new HttpError(
       "Signing up failed, please try again later.",
@@ -209,6 +243,37 @@ const addNewFriend = async (req, res, next) => {
     return next(error);
   }
 };
+
+const addNewVolunteer = async (req, res, next) => {
+  console.log(req.body);
+  try {
+    let existingUser = await Elder.findOneAndUpdate(
+      { phoneNumber: req.body.number },
+      { $push: { volunteers: req.body.volunteerID } }
+    );
+    volunteersdata = await Elder.find(
+      { phoneNumber: req.body.number },
+      { volunteers: 1, _id: 0 }
+    ).populate([
+      {
+        path: "volunteers",
+        select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
+      },
+    ]);
+    console.log(volunteersdata);
+    res.status(201).json({ volunteersdata: volunteersdata });
+    await Volunteer.findByIdAndUpdate(req.body.volunteerID, {
+      $push: { elders: existingUser._id },
+    });
+  } catch (err) {
+    const error = new HttpError(
+      "Signing up failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+};
+
 const insertNewGroup = async (req, res, next) => {
   console.log(req.body);
   try {
@@ -242,3 +307,4 @@ exports.checkUser = checkUser;
 exports.insertNewGroup = insertNewGroup;
 exports.updateLocation = updateLocation;
 exports.addNewFriend = addNewFriend;
+exports.addNewVolunteer = addNewVolunteer;

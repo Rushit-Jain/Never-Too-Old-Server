@@ -53,20 +53,20 @@ const elderSchema = new Schema({
   location: {
     type: {
       type: String, // Don't do `{ location: { type: String } }`
-      enum: ['Point'], // 'location.type' must be 'Point'
+      enum: ["Point"], // 'location.type' must be 'Point'
       // required: true
     },
     coordinates: {
       type: [Number],
       // required: true
-    }
+    },
   },
   friends: [
     {
       type: Schema.Types.ObjectId,
       // friendType: String,
       // refPath: "friendType",
-      ref: "Elder"
+      ref: "Elder",
     },
   ],
   volunteers: [
@@ -74,7 +74,7 @@ const elderSchema = new Schema({
       type: Schema.Types.ObjectId,
       // friendType: String,
       // refPath: "friendType",
-      ref: "Volunteer"
+      ref: "Volunteer",
     },
   ],
   interests: [{}],
@@ -87,11 +87,10 @@ const elderSchema = new Schema({
       // type: String,
     },
   ],
-  emergencyContacts: [
-    {
-      type: String,
-    },
-  ],
+  emergencyContacts: {
+    type: Map,
+    of: String,
+  },
 });
 
 module.exports = mongoose.model("Elder", elderSchema);
