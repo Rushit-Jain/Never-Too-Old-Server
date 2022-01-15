@@ -52,10 +52,6 @@ mongoose
     const io = require("./socket").initServer(server);
     io.on("connection", (socket) => {
       chatId = socket.handshake.headers.userid;
-      console.log(
-        "mcdmmkmrjjrvnjv j vfv jvnrjnvrjnvrjnrjnvfrj" +
-        socket.handshake.headers.groupIDs
-      );
       // if (socket.handshake.headers.groupIDs) {
       //   socket.handshake.headers.groupIDs.forEach(element => {
       //     console.log("uhduhuhuehudbdbfubybyeybdyhb" + element);
@@ -66,7 +62,7 @@ mongoose
 
       socket.on("joining_group_room", (jsonData) => {
         jsonData = JSON.parse(jsonData);
-        console.log("uhduhuhuehudbdbfubybyeybdyhb" + jsonData);
+        // console.log("uhduhuhuehudbdbfubybyeybdyhb" + jsonData);
         jsonData.groupIDs.forEach((element) => {
           socket.join(element);
         });
@@ -74,11 +70,11 @@ mongoose
 
       socket.on("join_all_groups", (groupIDs) => {
         groupIDs = JSON.parse(groupIDs);
-        console.log(
-          "uhduhuhuehudbdbfubybyeybdyhb77777777777777777777777777777777777" +
-          groupIDs
-        );
-        console.log(groupIDs);
+        // console.log(
+        //   "uhduhuhuehudbdbfubybyeybdyhb77777777777777777777777777777777777" +
+        //     groupIDs
+        // );
+        // console.log(groupIDs);
         groupIDs.groupIDs.forEach((element) => {
           socket.join(element);
         });
@@ -95,7 +91,7 @@ mongoose
           JSON.stringify({
             videocall_roomID: videocall_roomID,
             senderChatID: senderChatID,
-            senderName: senderName
+            senderName: senderName,
           })
         );
       });
@@ -117,7 +113,7 @@ mongoose
         socket.to(senderChatID).emit(
           "receiver_accepted_call",
           JSON.stringify({
-            "accepted": true
+            accepted: true,
           })
         );
       });
@@ -133,7 +129,7 @@ mongoose
           JSON.stringify({
             voicecall_roomID: voicecall_roomID,
             senderChatID: senderChatID,
-            senderName: senderName
+            senderName: senderName,
           })
         );
       });
@@ -147,6 +143,24 @@ mongoose
             voicecall_roomID: voicecall_roomID,
           })
         );
+      });
+
+      socket.on("book_meet", (meetData) => {
+        socket.to(JSON.parse(meetData).volunteer).emit("booked_meet", meetData);
+      });
+
+      socket.on("request_meet", (meetData) => {
+        meetData = JSON.parse(meetData);
+        // console.log(meetData.volunteerIds);
+        meetData.volunteerIds.forEach((e) => {
+          // console.log(e)
+          socket.to(e).emit("requested_meet", meetData.elderName);
+        });
+      });
+
+      socket.on("accept_meet", (meetData) => {
+        const { elderId, volunteerName } = JSON.parse(meetData);
+        socket.to(elderId).emit("meet_accepted", volunteerName);
       });
 
       //Send message to only a particular user

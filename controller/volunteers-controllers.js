@@ -3,7 +3,7 @@ const HttpError = require("../models/http-error");
 const Volunteer = require("../models/volunteer-model");
 
 const checkUser = async (req, res, next) => {
-  console.log("voluneterr", req.body);
+  // console.log("voluneterr", req.body);
   let existingUser;
   try {
     existingUser = await Volunteer.findOne(
@@ -35,14 +35,14 @@ const checkUser = async (req, res, next) => {
         {
           path: "elders",
           select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
-        }
+        },
       ]);
-      console.log(friendsdata);
+      // console.log(friendsdata);
       groupsdata = await Volunteer.find(
         { phoneNumber: req.body.number },
         { groups: 1, _id: 0 }
       );
-      console.log(existingUser);
+      // console.log(existingUser);
       present = "true";
       // return next(error);
     }
@@ -55,10 +55,8 @@ const checkUser = async (req, res, next) => {
 };
 
 const saveUser = async (req, res, next) => {
-
-  console.log(req.body);
-  const { phoneNumber, fname, lname, gender, language, document } =
-    req.body;
+  // console.log(req.body);
+  const { phoneNumber, fname, lname, gender, language, document } = req.body;
 
   const createdUser = new Volunteer({
     phoneNumber,
@@ -74,15 +72,14 @@ const saveUser = async (req, res, next) => {
     location: { type: "Point", coordinates: [72.0, 19.2] },
     friends: [],
     groups: [],
-
   });
   try {
-    console.log(typeof createdUser);
+    // console.log(typeof createdUser);
     createdUser
       .save()
       .then((result) => console.log(result))
       .catch((err) => console.log(err));
-    console.log("ssssssssssssssssssssss");
+    // console.log("ssssssssssssssssssssss");
     res.status(201).json(createdUser);
   } catch (err) {
     const error = new HttpError("User Creation Failed.29", 500);
@@ -91,13 +88,14 @@ const saveUser = async (req, res, next) => {
 };
 
 const updateLocation = async (req, res, next) => {
-  console.log(req.body.coordinates[0]);
+  // console.log(req.body.coordinates[0]);
   try {
     let existingUser = await Volunteer.findOneAndUpdate(
       { phoneNumber: req.body.number },
       { location: { type: "Point", coordinates: req.body.coordinates } }
     );
-    console.log(existingUser.location.coordinates);
+    res.status(201).json({});
+    // console.log(existingUser.location.coordinates);
   } catch (err) {
     const error = new HttpError(
       "Signing up failed, please try again later.",
@@ -106,7 +104,6 @@ const updateLocation = async (req, res, next) => {
     return next(error);
   }
 };
-
 
 exports.saveUser = saveUser;
 exports.checkUser = checkUser;

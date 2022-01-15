@@ -4,12 +4,12 @@ const Elder = require("../models/elder-model");
 const Volunteer = require("../models/volunteer-model");
 
 const checkUser = async (req, res, next) => {
-  console.log(req.body);
+  // console.log(req.body);
   let existingUser;
   try {
     existingUser = await Elder.findOne(
       { phoneNumber: req.body.number },
-      { friends: 0, groups: 0 }
+      { friends: 0, groups: 0, document: 0 }
     );
   } catch (err) {
     // const error = new HttpError(
@@ -42,12 +42,12 @@ const checkUser = async (req, res, next) => {
           select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
         },
       ]);
-      console.log(friendsdata);
+      // console.log(friendsdata);
       groupsdata = await Elder.find(
         { phoneNumber: req.body.number },
         { groups: 1, _id: 0 }
       );
-      console.log(existingUser);
+      // console.log(existingUser);
       present = "true";
       // return next(error);
     }
@@ -68,7 +68,7 @@ const saveUser = async (req, res, next) => {
   //   );
   // }
   // req.body = JSON.parse(Object.keys(req.body)[0]);
-  console.log(req.body);
+  // console.log(req.body);
   const {
     phoneNumber,
     fname,
@@ -99,12 +99,12 @@ const saveUser = async (req, res, next) => {
     emergencyContacts: emergencyContacts,
   });
   try {
-    console.log(typeof createdUser);
+    // console.log(typeof createdUser);
     createdUser
       .save()
       .then((result) => console.log(result))
       .catch((err) => console.log(err));
-    console.log("ssssssssssssssssssssss");
+    // console.log("ssssssssssssssssssssss");
     res.status(201).json(createdUser);
   } catch (err) {
     const error = new HttpError("User Creation Failed.29", 500);
@@ -113,7 +113,7 @@ const saveUser = async (req, res, next) => {
 };
 
 const getUser = async (req, res, next) => {
-  console.log(req.body);
+  // console.log(req.body);
   try {
     let existingUser = await Elder.findOne({ phoneNumber: req.body.number });
     res.status(201).json(existingUser);
@@ -127,13 +127,13 @@ const getUser = async (req, res, next) => {
 };
 
 const updateLocation = async (req, res, next) => {
-  console.log(req.body.coordinates[0]);
+  // console.log(req.body.coordinates[0]);
   try {
     let existingUser = await Elder.findOneAndUpdate(
       { phoneNumber: req.body.number },
       { location: { type: "Point", coordinates: req.body.coordinates } }
     );
-    console.log(existingUser.location.coordinates);
+    // console.log(existingUser.location.coordinates);
     // let friendsID = [];
     // for (var i = 0; i < ((existingUser.friends).length); i++) {
     //   let idsplit = existingUser.friends.toString().split("\"")
@@ -175,9 +175,9 @@ const updateLocation = async (req, res, next) => {
       },
       { _id: 1, firstName: 1, lastName: 1 }
     );
-    console.log("HEY there" + new_volunteers);
+    // console.log("HEY there" + new_volunteers);
 
-    console.log("ddddddddddddddddddddddd", new_friends);
+    // console.log("ddddddddddddddddddddddd", new_friends);
     var jaccard_indexes = [];
     let interest = existingUser.interests;
 
@@ -185,7 +185,7 @@ const updateLocation = async (req, res, next) => {
       if (new_friends[i].interests == []) continue;
       let bitwiseandlist = [];
       let bitwiseorlist = [];
-      console.log(new_friends[i].firstName, new_friends[i].interests);
+      // console.log(new_friends[i].firstName, new_friends[i].interests);
       for (var j = 0; j < 42; j++) {
         intersection = interest[j] && new_friends[i].interests[j];
         bitwiseandlist.push(intersection);
@@ -197,12 +197,12 @@ const updateLocation = async (req, res, next) => {
       let similarity =
         countOccurrences(bitwiseandlist, true) /
         countOccurrences(bitwiseorlist, true);
-      console.log(similarity);
+      // console.log(similarity);
       jaccard_indexes.push(similarity);
       new_friends[i].similarity = similarity;
     }
     new_friends.sort((a, b) => b.similarity - a.similarity);
-    console.log("sssssssssssssokodkdmk", new_friends);
+    // console.log("sssssssssssssokodkdmk", new_friends);
     res
       .status(201)
       .json({ new_friends: new_friends, new_volunteers: new_volunteers });
@@ -216,7 +216,7 @@ const updateLocation = async (req, res, next) => {
 };
 
 const addNewFriend = async (req, res, next) => {
-  console.log(req.body);
+  // console.log(req.body);
   try {
     let existingUser = await Elder.findOneAndUpdate(
       { phoneNumber: req.body.number },
@@ -245,7 +245,7 @@ const addNewFriend = async (req, res, next) => {
 };
 
 const addNewVolunteer = async (req, res, next) => {
-  console.log(req.body);
+  // console.log(req.body);
   try {
     let existingUser = await Elder.findOneAndUpdate(
       { phoneNumber: req.body.number },
@@ -260,7 +260,7 @@ const addNewVolunteer = async (req, res, next) => {
         select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
       },
     ]);
-    console.log(volunteersdata);
+    // console.log(volunteersdata);
     res.status(201).json({ volunteersdata: volunteersdata });
     await Volunteer.findByIdAndUpdate(req.body.volunteerID, {
       $push: { elders: existingUser._id },
