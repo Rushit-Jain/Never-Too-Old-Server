@@ -5,11 +5,11 @@ const Schema = mongoose.Schema;
 const timeSlotSchema = new Schema({
   elder: {
     type: Schema.Types.ObjectId,
-    ref: "Elder"
+    ref: "Elder",
   },
   volunteer: {
     type: Schema.Types.ObjectId,
-    ref: "Vounteer"
+    ref: "Volunteer",
   },
   startTime: {
     type: String,
