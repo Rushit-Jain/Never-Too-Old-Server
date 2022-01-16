@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const moment = require("moment");
 const HttpError = require("../models/http-error");
 const TimeSlot = require("../models/time-slot-model");
 const Elder = require("../models/elder-model");
@@ -139,7 +140,6 @@ exports.getLatestMeets = async (req, res, next) => {
         select: ["firstName", "lastName", "profilePicture"],
       },
     ]);
-    console.log("hi");
     res.status(201).json(meets);
   } catch (e) {
     const error = new HttpError(e, 500);
@@ -157,5 +157,62 @@ exports.acceptMeet = async (req, res, next) => {
     res.status(201).json({});
   } catch (e) {
     console.log(e);
+    return next(e);
+  }
+};
+
+exports.getUpcomingMeets = async (req, res, next) => {
+  try {
+    var upcomingMeets;
+    const { id, type } = req.query;
+    if (type == "elder") {
+      upcomingMeets = await TimeSlot.find({ elder: id })
+        .populate([
+          {
+            path: "volunteer",
+            select: ["firstName", "lastName", "profilePicture"],
+          },
+        ])
+        .lean();
+    } else {
+      upcomingMeets = await TimeSlot.find({ volunteer: id })
+        .populate([
+          {
+            path: "elder",
+            select: ["firstName", "lastName", "profilePicture"],
+          },
+        ])
+        .lean();
+    }
+    upcomingMeets = upcomingMeets.filter((e) => {
+      let day = e.date.split("-")[2].trim();
+      let month = (parseInt(e.date.split("-")[1].trim()) - 1).toString();
+      let year = e.date.split("-")[0].trim();
+      let ampm = e.startTime
+        .split(" ")
+        [e.startTime.split(" ").length - 1].trim();
+      let hour = e.startTime.split(":")[0].trim();
+      let min = e.startTime.split(":")[1].trim().split(" ")[0].trim();
+      if (min.length == 1) min = "0" + min;
+      let stringToCompare = hour + ":" + min + " " + ampm;
+      [hour, min] = moment(stringToCompare, ["h:mm A"])
+        .format("HH:mm")
+        .split(":");
+      var dateThen = new Date(
+        parseInt(year),
+        parseInt(month),
+        parseInt(day),
+        parseInt(hour),
+        parseInt(min),
+        0,
+        0
+      );
+      var dateNow = new Date();
+      return dateNow.getTime() <= dateThen.getTime();
+    });
+    res.status(201).json(upcomingMeets);
+  } catch (e) {
+    console.log(e);
+    return next(e);
   }
 };
