@@ -10,6 +10,8 @@ router.get("/getVolunteerMeets", meetController.getVolunteerMeets);
 router.get("/getLatestMeets", meetController.getLatestMeets);
 router.get("/upcomingMeets", meetController.getUpcomingMeets);
 router.put("/acceptMeet", meetController.acceptMeet);
+router.put("/updateSlots", meetController.updateSlots);
+router.get("/getNearbyVolunteers", meetController.getNearbyVolunteers);
 router.get("/", meetController.getMeet);
 
 module.exports = router;
