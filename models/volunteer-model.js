@@ -45,17 +45,18 @@ const volunteerSchema = new Schema({
   location: {
     type: {
       type: String, // Don't do `{ location: { type: String } }`
-      enum: ['Point'], // 'location.type' must be 'Point'
+      enum: ["Point"], // 'location.type' must be 'Point'
       // required: true
     },
     coordinates: {
       type: [Number],
       // required: true
-    }
-  }, elders: [
+    },
+  },
+  elders: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Elder"
+      ref: "Elder",
     },
   ],
   groups: [
@@ -63,7 +64,10 @@ const volunteerSchema = new Schema({
       type: String,
     },
   ],
-
+  slots: {
+    type: Map,
+    of: Array,
+  },
 });
 
 module.exports = mongoose.model("Volunteer", volunteerSchema);

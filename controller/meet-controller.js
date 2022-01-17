@@ -90,7 +90,7 @@ exports.getVolunteerMeets = async (req, res, next) => {
 
 exports.bookMeet = async (req, res, next) => {
   const { elder, date, startTime, meetType, endTime, volunteer } = req.body;
-
+  let timeOfDay = req.body.timeOfDay.split(".")[1].toLowerCase();
   const createdMeet = new TimeSlot({
     elder: elder,
     volunteer: volunteer,
@@ -101,14 +101,22 @@ exports.bookMeet = async (req, res, next) => {
     acceptanceStatus: true,
   });
   try {
+    let volunteerFromDb = await Volunteer.findById(volunteer);
+    let slots = volunteerFromDb.slots;
+    let updatedSlots = slots.get(timeOfDay);
+    updatedSlots = updatedSlots.filter(
+      (e) => e.localeCompare(req.body.slot) != 0
+    );
+    slots.set(timeOfDay, updatedSlots);
+    await Volunteer.findByIdAndUpdate(volunteer, { slots: slots });
     createdMeet
       .save()
-      .then((result) => console.log(result))
+      .then((result) => result)
       .catch((err) => console.log(err));
     res.status(201).json(createdMeet);
   } catch (err) {
-    const error = new HttpError("Meet Creation Failed", 500);
-    return next(error);
+    const error = new HttpError(err, 500);
+    return next(err);
   }
 };
 
@@ -211,6 +219,43 @@ exports.getUpcomingMeets = async (req, res, next) => {
       return dateNow.getTime() <= dateThen.getTime();
     });
     res.status(201).json(upcomingMeets);
+  } catch (e) {
+    console.log(e);
+    return next(e);
+  }
+};
+
+exports.updateSlots = async (req, res, next) => {
+  const { id, slots } = req.body;
+  try {
+    await Volunteer.findByIdAndUpdate(id, { slots: slots });
+    res.status(201).json({});
+  } catch (e) {
+    console.log(e);
+    return next(e);
+  }
+};
+
+exports.getNearbyVolunteers = async (req, res, next) => {
+  const { latitude, longitude } = req.query;
+  var volunteers;
+  try {
+    volunteers = await Volunteer.find(
+      {
+        location: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [longitude, latitude],
+            },
+            $maxDistance: 20000,
+            $minDistance: 0,
+          },
+        },
+      },
+      { document: 0 }
+    );
+    res.status(201).json(volunteers);
   } catch (e) {
     console.log(e);
     return next(e);
