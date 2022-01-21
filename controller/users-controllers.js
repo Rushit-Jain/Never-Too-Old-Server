@@ -4,7 +4,7 @@ const Elder = require("../models/elder-model");
 const Volunteer = require("../models/volunteer-model");
 
 const checkUser = async (req, res, next) => {
-  // console.log(req.body);
+  console.log(req.body);
   let existingUser;
   try {
     existingUser = await Elder.findOne(
@@ -156,7 +156,7 @@ const updateLocation = async (req, res, next) => {
           },
         },
       },
-      { _id: 1, firstName: 1, lastName: 1, interests: 1 }
+      { _id: 1, firstName: 1, lastName: 1, interests: 1, profilePicture: 1 }
     );
 
     let new_volunteers = await Volunteer.find(
@@ -231,10 +231,11 @@ const addNewFriend = async (req, res, next) => {
         select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
       },
     ]);
-    res.status(201).json({ friendsdata });
     await Elder.findByIdAndUpdate(req.body.friendID, {
       $push: { friends: existingUser._id },
     });
+    // console.log(existingUser);
+    res.status(201).json({});
   } catch (err) {
     const error = new HttpError(
       "Signing up failed, please try again later.",
@@ -281,6 +282,7 @@ const insertNewGroup = async (req, res, next) => {
       timestamp: req.body.timestamp,
       groupName: req.body.groupName,
       memberChatIDs: [req.body.creatorChatID, ...req.body.memberChatIDs],
+      creatorChatID: req.body.creatorChatID
     };
     let addNewGroup = await Elder.updateMany(
       { _id: { $in: [...req.body.memberChatIDs, req.body.creatorChatID] } },
@@ -290,7 +292,7 @@ const insertNewGroup = async (req, res, next) => {
     existingUser.groups.sort(
       (a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp)
     );
-    // console.log(existingUser.groups);
+    console.log(existingUser.groups);
     res.status(201).json(existingUser.groups[0]);
   } catch (err) {
     const error = new HttpError(

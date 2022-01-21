@@ -51,3 +51,19 @@ exports.getMessages = async (req, res, next) => {
     return next(err);
   }
 }
+exports.getAllMessages = async (req, res, next) => {
+  try {
+    var messages;
+    console.log(req.query.senderChatID);
+    const userId1 = req.query.senderChatID;
+    messages = await Message.find({
+      $or: [{ senderChatID: userId1 }, { receiverChatID: userId1 }],
+    }, { __v: 0 });
+    messages.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
+    console.log(messages);
+    res.json(messages);
+  } catch (e) {
+    const err = new HttpError(e.message, 500);
+    return next(err);
+  }
+}

@@ -72,8 +72,7 @@ const elderSchema = new Schema({
   volunteers: [
     {
       type: Schema.Types.ObjectId,
-      // friendType: String,
-      // refPath: "friendType",
+
       ref: "Volunteer",
     },
   ],
@@ -83,8 +82,11 @@ const elderSchema = new Schema({
       timestamp: { type: String },
       groupName: { type: String },
       memberChatIDs: [{}],
-      // memberChatIDs: [{ _id: { type: Schema.ObjectId } }]
-      // type: String,
+      creatorChatID: {
+        type: Schema.Types.ObjectId,
+        ref: "Elder",
+      }
+
     },
   ],
   emergencyContacts: {
