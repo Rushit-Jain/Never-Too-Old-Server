@@ -145,6 +145,19 @@ mongoose
         );
       });
 
+      socket.on("update_profile_picture", (jsonData) => {
+        jsonData = JSON.parse(jsonData);
+        dataToSend = JSON.stringify({
+          profilePicture: jsonData.profilePicture,
+          id: jsonData.id,
+          userType: jsonData.userType,
+        });
+        for (let i = 0; i < jsonData.receivers.length; i++)
+          socket
+            .to(jsonData.receivers[i])
+            .emit("profile_picture_updated", dataToSend);
+      });
+
       socket.on("book_meet", (meetData) => {
         socket.to(JSON.parse(meetData).volunteer).emit("booked_meet", meetData);
       });
