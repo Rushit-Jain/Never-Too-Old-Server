@@ -14,5 +14,7 @@ router.post("/addNewFriend", usersController.addNewFriend);
 router.post("/addNewVolunteer", usersController.addNewVolunteer);
 router.post("/insertNewGroup", usersController.insertNewGroup);
 router.put("/updateInterests", usersController.updateInterests);
+router.put("/updateEmergencyContacts", usersController.updateEmergencyContacts);
+router.put("/updateProfilePicture", usersController.updateProfilePicture);
 
 module.exports = router;

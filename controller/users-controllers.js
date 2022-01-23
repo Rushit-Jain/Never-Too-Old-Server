@@ -72,6 +72,30 @@ const updateInterests = async (req, res, next) => {
   }
 };
 
+const updateEmergencyContacts = async (req, res, next) => {
+  const { id, emergencyContacts } = req.body;
+  try {
+    var updatedElder = await Elder.findByIdAndUpdate(id, {
+      emergencyContacts: emergencyContacts,
+    });
+    res.status(201).json(updatedElder);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const updateProfilePicture = async (req, res, next) => {
+  const { id, profilePicture } = req.body;
+  try {
+    var updatedElder = await Elder.findByIdAndUpdate(id, {
+      profilePicture: profilePicture,
+    });
+    res.status(201).json(updatedElder);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 const saveUser = async (req, res, next) => {
   // const errors = validationResult(req);
   // console.log(errors);
@@ -327,3 +351,5 @@ exports.updateLocation = updateLocation;
 exports.addNewFriend = addNewFriend;
 exports.addNewVolunteer = addNewVolunteer;
 exports.updateInterests = updateInterests;
+exports.updateEmergencyContacts = updateEmergencyContacts;
+exports.updateProfilePicture = updateProfilePicture;

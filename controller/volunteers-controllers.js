@@ -115,6 +115,19 @@ const updateLocation = async (req, res, next) => {
   }
 };
 
+const updateProfilePicture = async (req, res, next) => {
+  const { id, profilePicture } = req.body;
+  try {
+    var updatedVolunteer = await Volunteer.findByIdAndUpdate(id, {
+      profilePicture: profilePicture,
+    });
+    res.status(201).json(updatedVolunteer);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 exports.saveUser = saveUser;
 exports.checkUser = checkUser;
 exports.updateLocation = updateLocation;
+exports.updateProfilePicture = updateProfilePicture;
