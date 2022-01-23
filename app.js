@@ -148,6 +148,25 @@ mongoose
       socket.on("book_meet", (meetData) => {
         socket.to(JSON.parse(meetData).volunteer).emit("booked_meet", meetData);
       });
+      socket.on("added_new_friend", (jsonData) => {
+        friendData = JSON.parse(jsonData);
+        friendID = friendData.friendID;
+        console.log("qqqqqqqqqqqqqqqqqq" + friendID);
+        socket.to(friendID).emit(
+          "new_friend_added",
+          JSON.stringify({
+            _id: friendData._id,
+            phoneNumber: friendData.phoneNumber,
+            firstName: friendData.firstName,
+            lastName: friendData.lastName,
+            profilePicture: friendData.profilePicture
+          })
+        );
+      });
+
+      socket.on("book_meet", (meetData) => {
+        socket.to(JSON.parse(meetData).volunteer).emit("booked_meet", meetData);
+      });
 
       socket.on("request_meet", (meetData) => {
         meetData = JSON.parse(meetData);
