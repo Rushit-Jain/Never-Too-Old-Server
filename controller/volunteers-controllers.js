@@ -56,7 +56,17 @@ const checkUser = async (req, res, next) => {
 
 const saveUser = async (req, res, next) => {
   // console.log(req.body);
-  const { phoneNumber, fname, lname, gender, language, document } = req.body;
+  const {
+    phoneNumber,
+    fname,
+    lname,
+    gender,
+    language,
+    document,
+    birthDay,
+    birthMonth,
+    birthYear,
+  } = req.body;
 
   const createdUser = new Volunteer({
     phoneNumber,
@@ -64,14 +74,19 @@ const saveUser = async (req, res, next) => {
     lastName: lname,
     gender: gender,
     document: document,
-    profilePicture: "wjdhwj",
-    birthDay: "28",
-    birthMonth: "11",
-    birthYear: "2000",
+    profilePicture: "",
+    birthDay: birthDay,
+    birthMonth: birthMonth,
+    birthYear: birthYear,
     language: language,
     location: { type: "Point", coordinates: [72.0, 19.2] },
     friends: [],
     groups: [],
+    slots: {
+      morning: [],
+      afternoon: [],
+      evening: [],
+    },
   });
   try {
     // console.log(typeof createdUser);
@@ -105,6 +120,19 @@ const updateLocation = async (req, res, next) => {
   }
 };
 
+const updateProfilePicture = async (req, res, next) => {
+  const { id, profilePicture } = req.body;
+  try {
+    var updatedVolunteer = await Volunteer.findByIdAndUpdate(id, {
+      profilePicture: profilePicture,
+    });
+    res.status(201).json(updatedVolunteer);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 exports.saveUser = saveUser;
 exports.checkUser = checkUser;
 exports.updateLocation = updateLocation;
+exports.updateProfilePicture = updateProfilePicture;
