@@ -148,6 +148,7 @@ mongoose
       socket.on("book_meet", (meetData) => {
         socket.to(JSON.parse(meetData).volunteer).emit("booked_meet", meetData);
       });
+
       socket.on("added_new_friend", (jsonData) => {
         friendData = JSON.parse(jsonData);
         friendID = friendData.friendID;
@@ -159,7 +160,22 @@ mongoose
             phoneNumber: friendData.phoneNumber,
             firstName: friendData.firstName,
             lastName: friendData.lastName,
-            profilePicture: friendData.profilePicture
+            profilePicture: friendData.profilePicture,
+          })
+        );
+      });
+
+      socket.on("added_new_volunteer", (jsonData) => {
+        volunteerData = JSON.parse(jsonData);
+        volunteerID = volunteerData.volunteerID;
+        socket.to(volunteerID).emit(
+          "new_volunteer_added",
+          JSON.stringify({
+            _id: volunteerData._id,
+            phoneNumber: volunteerData.phoneNumber,
+            firstName: volunteerData.firstName,
+            lastName: volunteerData.lastName,
+            profilePicture: volunteerData.profilePicture,
           })
         );
       });
@@ -230,7 +246,6 @@ mongoose
             "inviting_to_group",
             JSON.stringify({
               timestamp: timestamp,
-              message: "You Are Added",
               groupName: groupName,
               _id: _id,
               memberChatIDs: memberChatIDs,

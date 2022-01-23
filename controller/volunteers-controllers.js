@@ -56,7 +56,17 @@ const checkUser = async (req, res, next) => {
 
 const saveUser = async (req, res, next) => {
   // console.log(req.body);
-  const { phoneNumber, fname, lname, gender, language, document } = req.body;
+  const {
+    phoneNumber,
+    fname,
+    lname,
+    gender,
+    language,
+    document,
+    birthDay,
+    birthMonth,
+    birthYear,
+  } = req.body;
 
   const createdUser = new Volunteer({
     phoneNumber,
@@ -65,9 +75,9 @@ const saveUser = async (req, res, next) => {
     gender: gender,
     document: document,
     profilePicture: "wjdhwj",
-    birthDay: "28",
-    birthMonth: "11",
-    birthYear: "2000",
+    birthDay: birthDay,
+    birthMonth: birthMonth,
+    birthYear: birthYear,
     language: language,
     location: { type: "Point", coordinates: [72.0, 19.2] },
     friends: [],

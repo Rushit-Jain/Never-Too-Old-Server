@@ -59,6 +59,19 @@ const checkUser = async (req, res, next) => {
   }
 };
 
+const updateInterests = async (req, res, next) => {
+  const { id, interests } = req.body;
+  console.log(id + interests);
+  try {
+    var updatedElder = await Elder.findByIdAndUpdate(id, {
+      interests: interests,
+    });
+    res.status(201).json(updatedElder);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 const saveUser = async (req, res, next) => {
   // const errors = validationResult(req);
   // console.log(errors);
@@ -77,6 +90,9 @@ const saveUser = async (req, res, next) => {
     language,
     interests,
     document,
+    birthDay,
+    birthMonth,
+    birthYear,
     emergencyContacts,
   } = req.body;
 
@@ -87,9 +103,9 @@ const saveUser = async (req, res, next) => {
     gender: gender,
     document: document,
     profilePicture: "wjdhwj",
-    birthDay: "28",
-    birthMonth: "11",
-    birthYear: "2000",
+    birthDay: birthDay,
+    birthMonth: birthMonth,
+    birthYear: birthYear,
     language: language,
     location: { type: "Point", coordinates: [72.0, 19.2] },
     friends: [],
@@ -282,7 +298,7 @@ const insertNewGroup = async (req, res, next) => {
       timestamp: req.body.timestamp,
       groupName: req.body.groupName,
       memberChatIDs: [req.body.creatorChatID, ...req.body.memberChatIDs],
-      creatorChatID: req.body.creatorChatID
+      creatorChatID: req.body.creatorChatID,
     };
     let addNewGroup = await Elder.updateMany(
       { _id: { $in: [...req.body.memberChatIDs, req.body.creatorChatID] } },
@@ -310,3 +326,4 @@ exports.insertNewGroup = insertNewGroup;
 exports.updateLocation = updateLocation;
 exports.addNewFriend = addNewFriend;
 exports.addNewVolunteer = addNewVolunteer;
+exports.updateInterests = updateInterests;
