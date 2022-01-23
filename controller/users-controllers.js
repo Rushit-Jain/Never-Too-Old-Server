@@ -126,7 +126,7 @@ const saveUser = async (req, res, next) => {
     lastName: lname,
     gender: gender,
     document: document,
-    profilePicture: "wjdhwj",
+    profilePicture: "",
     birthDay: birthDay,
     birthMonth: birthMonth,
     birthYear: birthYear,
@@ -213,7 +213,7 @@ const updateLocation = async (req, res, next) => {
           },
         },
       },
-      { _id: 1, firstName: 1, lastName: 1 }
+      { _id: 1, firstName: 1, lastName: 1, profilePicture: 1 }
     );
     // console.log("HEY there" + new_volunteers);
 

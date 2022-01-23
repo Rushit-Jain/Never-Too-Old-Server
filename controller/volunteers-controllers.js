@@ -74,7 +74,7 @@ const saveUser = async (req, res, next) => {
     lastName: lname,
     gender: gender,
     document: document,
-    profilePicture: "wjdhwj",
+    profilePicture: "",
     birthDay: birthDay,
     birthMonth: birthMonth,
     birthYear: birthYear,
@@ -82,6 +82,11 @@ const saveUser = async (req, res, next) => {
     location: { type: "Point", coordinates: [72.0, 19.2] },
     friends: [],
     groups: [],
+    slots: {
+      morning: [],
+      afternoon: [],
+      evening: [],
+    },
   });
   try {
     // console.log(typeof createdUser);
