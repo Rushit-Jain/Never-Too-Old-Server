@@ -41,7 +41,8 @@ app.use((error, req, res, next) => {
 });
 
 //BELOW CODE IS FOR SOCKET.IO AND CHATTING
-var onlineuser = [];
+var onlineuser = {};
+var offlineMsgs = {};
 mongoose
   .connect(
     "mongodb+srv://rushit:never-too-old-project-test@cluster0.w1zfz.mongodb.net/never-too-old-db?retryWrites=true&w=majority"
@@ -65,22 +66,39 @@ mongoose
       friendStatus = [];
       friendIDS = [];
       socket.join(chatId);
+      if (offlineMsgs.hasOwnProperty(chatId)) {
+        offlineMsgs[chatId].forEach((e) => {
+          io.in(chatId).emit(
+            "receive_message",
+            JSON.stringify({
+              timestamp: e["timestamp"],
+              message: e["message"],
+              senderChatID: e["senderChatID"],
+              receiverChatID: e["receiverChatID"],
+              senderName: e["senderName"],
+            })
+          );
+        });
+        delete offlineMsgs[chatId];
+      }
       socket.on("getOnlineUser", (jsonData, ack) => {
         jsonData = JSON.parse(jsonData);
         friendIDS = jsonData.friendIDs;
-        jsonData.friendIDs.forEach(id => { if (onlineuser[id] != undefined) { friendStatus.push(id) } })
-        console.log(friendIDS);
-        console.log(onlineuser);
-        console.log(friendStatus);
+        jsonData.friendIDs.forEach((id) => {
+          if (onlineuser[id] != undefined) {
+            friendStatus.push(id);
+          }
+        });
+        // console.log(friendIDS);
+        // console.log(onlineuser);
+        // console.log(friendStatus);
         ack(JSON.stringify(friendStatus));
         friendStatus.forEach((id) => {
-          socket.to(id).emit(
-            "IamOnline",
-            JSON.stringify({ '_id': jsonData._id })
-          );
+          socket
+            .to(id)
+            .emit("IamOnline", JSON.stringify({ _id: jsonData._id }));
         });
-      })
-
+      });
 
       socket.on("joining_group_room", (jsonData) => {
         jsonData = JSON.parse(jsonData);
@@ -235,7 +253,6 @@ mongoose
 
       //Send message to only a particular user
       socket.on("send_message", (messageData) => {
-        // console.log(message);
         messageData = JSON.parse(messageData);
         timestamp = messageData.timestamp;
         message = messageData.text;
@@ -243,19 +260,44 @@ mongoose
         receiverChatID = messageData.receiverChatID;
         senderName =
           messageData.senderFirstName + " " + messageData.senderLastName;
-        console.log(receiverChatID);
+        if (onlineuser[receiverChatID]) {
+          socket.to(receiverChatID).emit(
+            "receive_message",
+            JSON.stringify({
+              timestamp: timestamp,
+              message: message,
+              senderChatID: senderChatID,
+              receiverChatID: receiverChatID,
+              senderName: senderName,
+            })
+          );
+        } else {
+          if (offlineMsgs.hasOwnProperty(receiverChatID)) {
+            offlineMsgs[receiverChatID] = [
+              ...offlineMsgs[receiverChatID],
+              {
+                timestamp: timestamp,
+                message: message,
+                senderChatID: senderChatID,
+                receiverChatID: receiverChatID,
+                senderName: senderName,
+              },
+            ];
+          } else {
+            offlineMsgs[receiverChatID] = [
+              {
+                timestamp: timestamp,
+                message: message,
+                senderChatID: senderChatID,
+                receiverChatID: receiverChatID,
+                senderName: senderName,
+              },
+            ];
+          }
+        }
+        // console.log(receiverChatID);
         //Send message to only that particular room
         // socket.broadcast.emit("test", "test");
-        socket.to(receiverChatID).emit(
-          "receive_message",
-          JSON.stringify({
-            timestamp: timestamp,
-            message: message,
-            senderChatID: senderChatID,
-            receiverChatID: receiverChatID,
-            senderName: senderName,
-          })
-        );
         // console.log("hi");
       });
       socket.on("creating_group", (newGroupData) => {
@@ -291,10 +333,13 @@ mongoose
       });
       console.log(`Connected: ${socket.id}`);
       socket.on("disconnect", () => {
-        onlineuser = onlineuser.filter(id => onlineuser[id] = socket.id)
-        console.log(`Disconnected: ${socket.id}`)
+        Object.keys(onlineuser).forEach((e) => {
+          if (onlineuser[e] === socket.id) delete onlineuser[e];
+        });
+        // onlineuser = Object.keys(onlineuser).filter((id) => (onlineuser[id] = socket.id));
+        console.log(`Disconnected: ${socket.id}`);
         // socket.emit("checkOnlineUser")
-        socket.broadcast.emit('checkOnlineUser', 'hello friends!');
+        socket.broadcast.emit("checkOnlineUser", "hello friends!");
         console.log("wwwwwwwwwwwwwwwwwww");
       });
       // socket.on("offline", (jsonData) => {
