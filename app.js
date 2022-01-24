@@ -41,7 +41,7 @@ app.use((error, req, res, next) => {
 });
 
 //BELOW CODE IS FOR SOCKET.IO AND CHATTING
-
+var onlineuser = [];
 mongoose
   .connect(
     "mongodb+srv://rushit:never-too-old-project-test@cluster0.w1zfz.mongodb.net/never-too-old-db?retryWrites=true&w=majority"
@@ -50,15 +50,37 @@ mongoose
     const server = app.listen(5000);
 
     const io = require("./socket").initServer(server);
+
     io.on("connection", (socket) => {
       chatId = socket.handshake.headers.userid;
+      // friendIDs = socket.handshake.headers.friendids
+      console.log("rrrrrr" + onlineuser);
+      onlineuser[chatId] = socket.id;
       // if (socket.handshake.headers.groupIDs) {
       //   socket.handshake.headers.groupIDs.forEach(element => {
       //     console.log("uhduhuhuehudbdbfubybyeybdyhb" + element);
       //     socket.join(element);
       //   });
       // }
+      friendStatus = [];
+      friendIDS = [];
       socket.join(chatId);
+      socket.on("getOnlineUser", (jsonData, ack) => {
+        jsonData = JSON.parse(jsonData);
+        friendIDS = jsonData.friendIDs;
+        jsonData.friendIDs.forEach(id => { if (onlineuser[id] != undefined) { friendStatus.push(id) } })
+        console.log(friendIDS);
+        console.log(onlineuser);
+        console.log(friendStatus);
+        ack(JSON.stringify(friendStatus));
+        friendStatus.forEach((id) => {
+          socket.to(id).emit(
+            "IamOnline",
+            JSON.stringify({ '_id': jsonData._id })
+          );
+        });
+      })
+
 
       socket.on("joining_group_room", (jsonData) => {
         jsonData = JSON.parse(jsonData);
@@ -268,7 +290,23 @@ mongoose
         });
       });
       console.log(`Connected: ${socket.id}`);
-      socket.on("disconnect", () => console.log(`Disconnected: ${socket.id}`));
+      socket.on("disconnect", () => {
+        onlineuser = onlineuser.filter(id => onlineuser[id] = socket.id)
+        console.log(`Disconnected: ${socket.id}`)
+        // socket.emit("checkOnlineUser")
+        socket.broadcast.emit('checkOnlineUser', 'hello friends!');
+        console.log("wwwwwwwwwwwwwwwwwww");
+      });
+      // socket.on("offline", (jsonData) => {
+      //   jsonData = JSON.parse(jsonData)
+      //   console.log(jsonData.friendIDS);
+      //   onlineuser = onlineuser.filter(id => id != jsonData.chatID)
+      //   jsonData.friendIDs.forEach(e => {
+      //     socket.to(e).emit("goneOffline", JSON.stringify({
+      //       _id: jsonData.chatID,
+      //     }))
+      //   })
+      // });
     });
   })
   .catch((err) => console.log(err));
