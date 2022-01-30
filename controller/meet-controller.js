@@ -6,8 +6,8 @@ const Elder = require("../models/elder-model");
 const Volunteer = require("../models/volunteer-model");
 
 exports.saveRequestMeet = async (req, res, next) => {
-  const { userId, date, time, meetType } = req.body;
-  // console.log(req.body);
+  const { userId, date, time, meetType, meetStatus, latitude, longitude } = req.body;
+  console.log(req.body);
 
   const createdMeet = new TimeSlot({
     elder: userId,
@@ -16,13 +16,15 @@ exports.saveRequestMeet = async (req, res, next) => {
     endTime: "",
     date: date,
     meetType: meetType,
+    meetLocation: { type: "Point", coordinates: [longitude, latitude] },
+    meetStatus: meetStatus,
     acceptanceStatus: false,
   });
   try {
     // console.log(typeof createdMeet);
     createdMeet
       .save()
-      .then((result) => {})
+      .then((result) => { })
       .catch((err) => console.log(err));
     res.status(201).json(createdMeet);
   } catch (err) {
@@ -198,7 +200,7 @@ exports.getUpcomingMeets = async (req, res, next) => {
       let year = e.date.split("-")[0].trim();
       let ampm = e.startTime
         .split(" ")
-        [e.startTime.split(" ").length - 1].trim();
+      [e.startTime.split(" ").length - 1].trim();
       let hour = e.startTime.split(":")[0].trim();
       let min = e.startTime.split(":")[1].trim().split(" ")[0].trim();
       if (min.length == 1) min = "0" + min;
