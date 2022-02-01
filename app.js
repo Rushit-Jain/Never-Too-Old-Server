@@ -43,6 +43,8 @@ app.use((error, req, res, next) => {
 //BELOW CODE IS FOR SOCKET.IO AND CHATTING
 var onlineuser = {};
 var offlineMsgs = {};
+var pendingMeetAcceptanceNotifications = {};
+var pendingMeetBookingNotifications = {};
 mongoose
   .connect(
     "mongodb+srv://rushit:never-too-old-project-test@cluster0.w1zfz.mongodb.net/never-too-old-db?retryWrites=true&w=majority"
@@ -80,6 +82,18 @@ mongoose
           );
         });
         delete offlineMsgs[chatId];
+      }
+      if (pendingMeetAcceptanceNotifications.hasOwnProperty(chatId)) {
+        pendingMeetAcceptanceNotifications[chatId].forEach((e) =>
+          io.in(chatId).emit("meet_accepted", e)
+        );
+        delete pendingMeetAcceptanceNotifications[chatId];
+      }
+      if (pendingMeetBookingNotifications.hasOwnProperty(chatId)) {
+        pendingMeetBookingNotifications[chatId].forEach((e) =>
+          io.in(chatId).emit("booked_meet", e)
+        );
+        delete pendingMeetBookingNotifications[chatId];
       }
       socket.on("getOnlineUser", (jsonData, ack) => {
         jsonData = JSON.parse(jsonData);
@@ -234,7 +248,19 @@ mongoose
       });
 
       socket.on("book_meet", (meetData) => {
-        socket.to(JSON.parse(meetData).volunteer).emit("booked_meet", meetData);
+        const { volunteer } = JSON.parse(meetData);
+        if (onlineuser[volunteer]) {
+          socket.to(volunteer).emit("booked_meet", meetData);
+        } else {
+          if (pendingMeetBookingNotifications.hasOwnProperty(volunteer)) {
+            pendingMeetBookingNotifications[volunteer] = [
+              ...pendingMeetBookingNotifications[volunteer],
+              meetData,
+            ];
+          } else {
+            pendingMeetBookingNotifications[volunteer] = [meetData];
+          }
+        }
       });
 
       socket.on("request_meet", (meetData) => {
@@ -248,7 +274,18 @@ mongoose
 
       socket.on("accept_meet", (meetData) => {
         const { elderId } = JSON.parse(meetData);
-        socket.to(elderId).emit("meet_accepted", meetData);
+        if (onlineuser[elderId]) {
+          socket.to(elderId).emit("meet_accepted", meetData);
+        } else {
+          if (pendingMeetAcceptanceNotifications.hasOwnProperty(elderId)) {
+            pendingMeetAcceptanceNotifications[elderId] = [
+              ...pendingMeetAcceptanceNotifications[elderId],
+              meetData,
+            ];
+          } else {
+            pendingMeetAcceptanceNotifications[elderId] = [meetData];
+          }
+        }
       });
 
       //Send message to only a particular user
