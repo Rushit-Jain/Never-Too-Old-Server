@@ -6,7 +6,8 @@ const Elder = require("../models/elder-model");
 const Volunteer = require("../models/volunteer-model");
 
 exports.saveRequestMeet = async (req, res, next) => {
-  const { userId, date, time, meetType, meetStatus, latitude, longitude } = req.body;
+  const { userId, date, time, meetType, meetStatus, latitude, longitude } =
+    req.body;
   console.log(req.body);
 
   const createdMeet = new TimeSlot({
@@ -24,7 +25,7 @@ exports.saveRequestMeet = async (req, res, next) => {
     // console.log(typeof createdMeet);
     createdMeet
       .save()
-      .then((result) => { })
+      .then((result) => {})
       .catch((err) => console.log(err));
     res.status(201).json(createdMeet);
   } catch (err) {
@@ -91,7 +92,8 @@ exports.getVolunteerMeets = async (req, res, next) => {
 };
 
 exports.bookMeet = async (req, res, next) => {
-  const { elder, date, startTime, meetType, endTime, volunteer } = req.body;
+  const { elder, date, startTime, meetType, endTime, volunteer, meetStatus } =
+    req.body;
   let timeOfDay = req.body.timeOfDay.split(".")[1].toLowerCase();
   const createdMeet = new TimeSlot({
     elder: elder,
@@ -100,15 +102,18 @@ exports.bookMeet = async (req, res, next) => {
     endTime: endTime,
     date: date,
     meetType: meetType,
+    meetStatus: meetStatus,
     acceptanceStatus: true,
   });
   try {
     let volunteerFromDb = await Volunteer.findById(volunteer);
+    console.log(volunteerFromDb);
     let slots = volunteerFromDb.slots;
     let updatedSlots = slots.get(timeOfDay);
     updatedSlots = updatedSlots.filter(
       (e) => e.localeCompare(req.body.slot) != 0
     );
+    console.log(updatedSlots);
     slots.set(timeOfDay, updatedSlots);
     await Volunteer.findByIdAndUpdate(volunteer, { slots: slots });
     createdMeet
@@ -159,10 +164,11 @@ exports.getLatestMeets = async (req, res, next) => {
 
 exports.acceptMeet = async (req, res, next) => {
   try {
-    const { meetId, volunteerId } = req.query;
+    const { meetId, volunteerId, meetStatus } = req.query;
     let result = await TimeSlot.findByIdAndUpdate(meetId, {
       acceptanceStatus: true,
       volunteer: volunteerId,
+      meetStatus: meetStatus,
     });
     res.status(201).json({});
   } catch (e) {
@@ -200,7 +206,7 @@ exports.getUpcomingMeets = async (req, res, next) => {
       let year = e.date.split("-")[0].trim();
       let ampm = e.startTime
         .split(" ")
-      [e.startTime.split(" ").length - 1].trim();
+        [e.startTime.split(" ").length - 1].trim();
       let hour = e.startTime.split(":")[0].trim();
       let min = e.startTime.split(":")[1].trim().split(" ")[0].trim();
       if (min.length == 1) min = "0" + min;

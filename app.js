@@ -198,9 +198,9 @@ mongoose
             .emit("profile_picture_updated", dataToSend);
       });
 
-      socket.on("book_meet", (meetData) => {
-        socket.to(JSON.parse(meetData).volunteer).emit("booked_meet", meetData);
-      });
+      // socket.on("book_meet", (meetData) => {
+      //   socket.to(JSON.parse(meetData).volunteer).emit("booked_meet", meetData);
+      // });
 
       socket.on("added_new_friend", (jsonData) => {
         friendData = JSON.parse(jsonData);
@@ -247,8 +247,8 @@ mongoose
       });
 
       socket.on("accept_meet", (meetData) => {
-        const { elderId, volunteerName } = JSON.parse(meetData);
-        socket.to(elderId).emit("meet_accepted", volunteerName);
+        const { elderId } = JSON.parse(meetData);
+        socket.to(elderId).emit("meet_accepted", meetData);
       });
 
       //Send message to only a particular user
