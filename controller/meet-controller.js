@@ -25,8 +25,9 @@ exports.saveRequestMeet = async (req, res, next) => {
     // console.log(typeof createdMeet);
     createdMeet
       .save()
-      .then((result) => {})
+      .then((result) => require("../elder-slots").addSlot(result._id))
       .catch((err) => console.log(err));
+
     res.status(201).json(createdMeet);
   } catch (err) {
     const error = new HttpError("User Creation Failed.29", 500);
@@ -237,6 +238,7 @@ exports.updateSlots = async (req, res, next) => {
   const { id, slots } = req.body;
   try {
     await Volunteer.findByIdAndUpdate(id, { slots: slots });
+    require("../volunteer-slots").updateVolunteerSlots(id, slots);
     res.status(201).json({});
   } catch (e) {
     console.log(e);
