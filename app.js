@@ -55,6 +55,7 @@ mongoose
     const io = require("./socket").initServer(server);
 
     const volunteerSlots = require("./volunteer-slots");
+    const elderSlots = require("./elder-slots");
 
     io.on("connection", (socket) => {
       chatId = socket.handshake.headers.userid;
@@ -306,19 +307,29 @@ mongoose
         });
       });
 
-      socket.on("accept_meet", (meetData) => {
-        const { elderId } = JSON.parse(meetData);
-        if (onlineuser[elderId]) {
-          socket.to(elderId).emit("meet_accepted", meetData);
-        } else {
-          if (pendingMeetAcceptanceNotifications.hasOwnProperty(elderId)) {
-            pendingMeetAcceptanceNotifications[elderId] = [
-              ...pendingMeetAcceptanceNotifications[elderId],
-              meetData,
-            ];
+      socket.on("accept_meet", (meetData, callback) => {
+        const { elderId, meetId } = JSON.parse(meetData);
+        if (elderSlots.isSlotPresent(meetId)) {
+          elderSlots.removeSlot(meetId);
+          if (onlineuser[elderId]) {
+            socket.to(elderId).emit("meet_accepted", meetData);
           } else {
-            pendingMeetAcceptanceNotifications[elderId] = [meetData];
+            if (pendingMeetAcceptanceNotifications.hasOwnProperty(elderId)) {
+              pendingMeetAcceptanceNotifications[elderId] = [
+                ...pendingMeetAcceptanceNotifications[elderId],
+                meetData,
+              ];
+            } else {
+              pendingMeetAcceptanceNotifications[elderId] = [meetData];
+            }
           }
+          callback({
+            status: "success",
+          });
+        } else {
+          callback({
+            status: "failed",
+          });
         }
       });
 

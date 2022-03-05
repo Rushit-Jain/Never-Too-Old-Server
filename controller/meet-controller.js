@@ -25,8 +25,9 @@ exports.saveRequestMeet = async (req, res, next) => {
     // console.log(typeof createdMeet);
     createdMeet
       .save()
-      .then((result) => {})
+      .then((result) => require("../elder-slots").addSlot(result._id))
       .catch((err) => console.log(err));
+
     res.status(201).json(createdMeet);
   } catch (err) {
     const error = new HttpError("User Creation Failed.29", 500);
