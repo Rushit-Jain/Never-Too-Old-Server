@@ -171,6 +171,19 @@ mongoose
           })
         );
       });
+      socket.on("droppedBeforAccepted", (jsonData) => {
+        jsonData = JSON.parse(jsonData);
+        receiverChatID = jsonData.receiverChatID,
+          type = jsonData.type
+        socket.to(receiverChatID).emit(
+          "droppingTheCall",
+          JSON.stringify({
+            type: type,
+          })
+        );
+      });
+
+
 
       socket.on("voice_call_invite", (jsonData) => {
         jsonData = JSON.parse(jsonData);

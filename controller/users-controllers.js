@@ -167,7 +167,7 @@ const getUser = async (req, res, next) => {
 };
 
 const updateLocation = async (req, res, next) => {
-  // console.log(req.body.coordinates[0]);
+  console.log(req.body.coordinates[0]);
   try {
     let existingUser = await Elder.findOneAndUpdate(
       { phoneNumber: req.body.number },
@@ -196,7 +196,7 @@ const updateLocation = async (req, res, next) => {
           },
         },
       },
-      { _id: 1, firstName: 1, lastName: 1, interests: 1, profilePicture: 1 }
+      { _id: 1, firstName: 1, lastName: 1, interests: 1, profilePicture: 1, gender: 1 }
     );
 
     let new_volunteers = await Volunteer.find(
@@ -220,7 +220,7 @@ const updateLocation = async (req, res, next) => {
     // console.log("ddddddddddddddddddddddd", new_friends);
     var jaccard_indexes = [];
     let interest = existingUser.interests;
-
+    var friendswithsimilarity = [];
     for (var i = 0; i < new_friends.length; i++) {
       if (new_friends[i].interests == []) continue;
       let bitwiseandlist = [];
@@ -239,13 +239,17 @@ const updateLocation = async (req, res, next) => {
         countOccurrences(bitwiseorlist, true);
       // console.log(similarity);
       jaccard_indexes.push(similarity);
-      new_friends[i].similarity = similarity;
+      friendswithsimilarity.push({ "_id": new_friends[i]._id, "firstName": new_friends[i].firstName, "lastName": new_friends[i].lastName, "profilePicture": new_friends[i].profilePicture, "interests": new_friends[i].interests, "similarity": Math.round(similarity * 100) / 100, "gender": new_friends[i].gender });
+      // friendswithsimilarity[i].similarity = similarity;
+      // new_friends[i].similarity = similarity;
     }
-    new_friends.sort((a, b) => b.similarity - a.similarity);
     // console.log("sssssssssssssokodkdmk", new_friends);
+    friendswithsimilarity.sort((a, b) => b.similarity - a.similarity);
+
+    // console.log("s", friendswithsimilarity);
     res
       .status(201)
-      .json({ new_friends: new_friends, new_volunteers: new_volunteers });
+      .json({ new_friends: friendswithsimilarity, new_volunteers: new_volunteers });
   } catch (err) {
     const error = new HttpError(
       "Signing up failed, please try again later.",
