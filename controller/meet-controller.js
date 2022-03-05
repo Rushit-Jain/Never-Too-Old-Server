@@ -237,6 +237,7 @@ exports.updateSlots = async (req, res, next) => {
   const { id, slots } = req.body;
   try {
     await Volunteer.findByIdAndUpdate(id, { slots: slots });
+    require("../volunteer-slots").updateVolunteerSlots(id, slots);
     res.status(201).json({});
   } catch (e) {
     console.log(e);

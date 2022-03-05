@@ -54,6 +54,8 @@ mongoose
 
     const io = require("./socket").initServer(server);
 
+    const volunteerSlots = require("./volunteer-slots");
+
     io.on("connection", (socket) => {
       chatId = socket.handshake.headers.userid;
       // friendIDs = socket.handshake.headers.friendids
@@ -173,8 +175,7 @@ mongoose
       });
       socket.on("droppedBeforAccepted", (jsonData) => {
         jsonData = JSON.parse(jsonData);
-        receiverChatID = jsonData.receiverChatID,
-          type = jsonData.type
+        (receiverChatID = jsonData.receiverChatID), (type = jsonData.type);
         socket.to(receiverChatID).emit(
           "droppingTheCall",
           JSON.stringify({
@@ -182,8 +183,6 @@ mongoose
           })
         );
       });
-
-
 
       socket.on("voice_call_invite", (jsonData) => {
         jsonData = JSON.parse(jsonData);
@@ -260,19 +259,41 @@ mongoose
         );
       });
 
-      socket.on("book_meet", (meetData) => {
-        const { volunteer } = JSON.parse(meetData);
-        if (onlineuser[volunteer]) {
-          socket.to(volunteer).emit("booked_meet", meetData);
-        } else {
-          if (pendingMeetBookingNotifications.hasOwnProperty(volunteer)) {
-            pendingMeetBookingNotifications[volunteer] = [
-              ...pendingMeetBookingNotifications[volunteer],
-              meetData,
-            ];
+      socket.on("book_meet", (meetData, callback) => {
+        const { volunteer, slot, timeOfDay } = JSON.parse(meetData);
+        if (
+          volunteerSlots.isSlotPresent(
+            volunteer,
+            timeOfDay.split(".")[1].toLowerCase(),
+            slot
+          )
+        ) {
+          let updatedVolunteerSlots =
+            volunteerSlots.getVolunteerSlots(volunteer);
+          updatedVolunteerSlots[timeOfDay.split(".")[1].toLowerCase()] =
+            updatedVolunteerSlots[timeOfDay.split(".")[1].toLowerCase()].filter(
+              (s) => s != slot
+            );
+          volunteerSlots.updateVolunteerSlots(volunteer, updatedVolunteerSlots);
+          if (onlineuser[volunteer]) {
+            socket.to(volunteer).emit("booked_meet", meetData);
           } else {
-            pendingMeetBookingNotifications[volunteer] = [meetData];
+            if (pendingMeetBookingNotifications.hasOwnProperty(volunteer)) {
+              pendingMeetBookingNotifications[volunteer] = [
+                ...pendingMeetBookingNotifications[volunteer],
+                meetData,
+              ];
+            } else {
+              pendingMeetBookingNotifications[volunteer] = [meetData];
+            }
           }
+          callback({
+            status: "booked",
+          });
+        } else {
+          callback({
+            status: "failed",
+          });
         }
       });
 
