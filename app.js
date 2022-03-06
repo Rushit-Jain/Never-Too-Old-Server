@@ -59,6 +59,7 @@ mongoose
 
     io.on("connection", (socket) => {
       chatId = socket.handshake.headers.userid;
+      loggingIN = socket.handshake.headers.loggingin;
       // friendIDs = socket.handshake.headers.friendids
       console.log("rrrrrr" + onlineuser);
       onlineuser[chatId] = socket.id;
@@ -71,21 +72,39 @@ mongoose
       friendStatus = [];
       friendIDS = [];
       socket.join(chatId);
-      if (offlineMsgs.hasOwnProperty(chatId)) {
-        offlineMsgs[chatId].forEach((e) => {
-          io.in(chatId).emit(
-            "receive_message",
-            JSON.stringify({
-              timestamp: e["timestamp"],
-              message: e["message"],
-              senderChatID: e["senderChatID"],
-              receiverChatID: e["receiverChatID"],
-              senderName: e["senderName"],
-            })
-          );
-        });
-        delete offlineMsgs[chatId];
-      }
+      console.log(loggingIN);
+      // socket.on("user-login", (data) => {
+      //   jsonData = JSON.parse(data);
+      //   console.log(jsonData.senderChatID);
+      //   console.log(chatId);
+      //   console.log(offlineMsgs[chatId]);
+      //   console.log(offlineMsgs);
+      //   if (offlineMsgs.hasOwnProperty(jsonData.senderChatID))
+      //     delete offlineMsgs[chatId];
+      // });
+      socket.on("first_emit", (data) => {
+        jsonData = JSON.parse(data);
+        console.log(typeof jsonData.loggingIN);
+        if (offlineMsgs.hasOwnProperty(chatId)) {
+          if (jsonData.loggingIN) {
+            delete offlineMsgs[chatId];
+          } else {
+            offlineMsgs[chatId].forEach((e) => {
+              io.in(chatId).emit(
+                "receive_message",
+                JSON.stringify({
+                  timestamp: e["timestamp"],
+                  message: e["message"],
+                  senderChatID: e["senderChatID"],
+                  receiverChatID: e["receiverChatID"],
+                  senderName: e["senderName"],
+                })
+              );
+            });
+            delete offlineMsgs[chatId];
+          }
+        }
+      });
       if (pendingMeetAcceptanceNotifications.hasOwnProperty(chatId)) {
         pendingMeetAcceptanceNotifications[chatId].forEach((e) =>
           io.in(chatId).emit("meet_accepted", e)
