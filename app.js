@@ -72,7 +72,7 @@ mongoose
       friendStatus = [];
       friendIDS = [];
       socket.join(chatId);
-      console.log(loggingIN);
+      // console.log(loggingIN);
       // socket.on("user-login", (data) => {
       //   jsonData = JSON.parse(data);
       //   console.log(jsonData.senderChatID);
@@ -84,7 +84,7 @@ mongoose
       // });
       socket.on("first_emit", (data) => {
         jsonData = JSON.parse(data);
-        console.log(typeof jsonData.loggingIN);
+        // console.log(typeof jsonData.loggingIN);
         if (offlineMsgs.hasOwnProperty(chatId)) {
           if (jsonData.loggingIN) {
             delete offlineMsgs[chatId];
