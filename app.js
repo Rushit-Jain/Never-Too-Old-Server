@@ -50,7 +50,7 @@ mongoose
     "mongodb+srv://rushit:never-too-old-project-test@cluster0.w1zfz.mongodb.net/never-too-old-db?retryWrites=true&w=majority"
   )
   .then((result) => {
-    const server = app.listen(5000);
+    const server = app.listen(process.env.PORT || 5000);
 
     const io = require("./socket").initServer(server);
 
