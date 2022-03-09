@@ -11,6 +11,5 @@ module.exports = {
   initialize: async () => {
     let volunteers = await Volunteer.find({}, { _id: 1, slots: 1 }).lean();
     volunteers.forEach((v) => (volunteerSlots[v._id] = v.slots));
-    console.log(volunteerSlots);
   },
 };
