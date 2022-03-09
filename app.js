@@ -19,7 +19,10 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE"
+  );
 
   next();
 });
@@ -56,6 +59,7 @@ mongoose
 
     const volunteerSlots = require("./volunteer-slots");
     const elderSlots = require("./elder-slots");
+    volunteerSlots.initialize();
 
     io.on("connection", (socket) => {
       chatId = socket.handshake.headers.userid;
