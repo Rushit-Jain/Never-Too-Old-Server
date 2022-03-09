@@ -1,5 +1,4 @@
 let volunteerSlots = {};
-const mongoose = require("mongoose");
 const Volunteer = require("./models/volunteer-model");
 
 module.exports = {
