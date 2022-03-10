@@ -367,7 +367,7 @@ mongoose
         senderName =
           messageData.senderFirstName + " " + messageData.senderLastName;
         console.log(memberChatIDs);
-        if (memberChatIDs.length != 0) {
+        if (memberChatIDs.length == 0) {
           console.log("SINGLE CHAT");
           if (onlineuser[receiverChatID]) {
             console.log(receiverChatID);
