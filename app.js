@@ -363,42 +363,83 @@ mongoose
         message = messageData.text;
         senderChatID = messageData.senderChatID;
         receiverChatID = messageData.receiverChatID;
+        memberChatIDs = messageData.memberChatIDs;
         senderName =
           messageData.senderFirstName + " " + messageData.senderLastName;
-        if (onlineuser[receiverChatID]) {
-          socket.to(receiverChatID).emit(
-            "receive_message",
-            JSON.stringify({
-              timestamp: timestamp,
-              message: message,
-              senderChatID: senderChatID,
-              receiverChatID: receiverChatID,
-              senderName: senderName,
-            })
-          );
-        } else {
-          if (offlineMsgs.hasOwnProperty(receiverChatID)) {
-            offlineMsgs[receiverChatID] = [
-              ...offlineMsgs[receiverChatID],
-              {
+        if (memberChatIDs.length != 0) {
+          if (onlineuser[receiverChatID]) {
+            socket.to(receiverChatID).emit(
+              "receive_message",
+              JSON.stringify({
                 timestamp: timestamp,
                 message: message,
                 senderChatID: senderChatID,
                 receiverChatID: receiverChatID,
                 senderName: senderName,
-              },
-            ];
+              })
+            );
           } else {
-            offlineMsgs[receiverChatID] = [
-              {
-                timestamp: timestamp,
-                message: message,
-                senderChatID: senderChatID,
-                receiverChatID: receiverChatID,
-                senderName: senderName,
-              },
-            ];
+            if (offlineMsgs.hasOwnProperty(receiverChatID)) {
+              offlineMsgs[receiverChatID] = [
+                ...offlineMsgs[receiverChatID],
+                {
+                  timestamp: timestamp,
+                  message: message,
+                  senderChatID: senderChatID,
+                  receiverChatID: receiverChatID,
+                  senderName: senderName,
+                },
+              ];
+            } else {
+              offlineMsgs[receiverChatID] = [
+                {
+                  timestamp: timestamp,
+                  message: message,
+                  senderChatID: senderChatID,
+                  receiverChatID: receiverChatID,
+                  senderName: senderName,
+                },
+              ];
+            }
           }
+        } else {
+          memberChatIDs.forEach((m) => {
+            if (onlineuser[m]) {
+              socket.to(receiverChatID).emit(
+                "receive_message",
+                JSON.stringify({
+                  timestamp: timestamp,
+                  message: message,
+                  senderChatID: senderChatID,
+                  receiverChatID: receiverChatID,
+                  senderName: senderName,
+                })
+              );
+            } else {
+              if (offlineMsgs.hasOwnProperty(m)) {
+                offlineMsgs[m] = [
+                  ...offlineMsgs[m],
+                  {
+                    timestamp: timestamp,
+                    message: message,
+                    senderChatID: senderChatID,
+                    receiverChatID: receiverChatID,
+                    senderName: senderName,
+                  },
+                ];
+              } else {
+                offlineMsgs[m] = [
+                  {
+                    timestamp: timestamp,
+                    message: message,
+                    senderChatID: senderChatID,
+                    receiverChatID: receiverChatID,
+                    senderName: senderName,
+                  },
+                ];
+              }
+            }
+          });
         }
         // console.log(receiverChatID);
         //Send message to only that particular room
