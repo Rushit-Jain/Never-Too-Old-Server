@@ -366,6 +366,7 @@ mongoose
         memberChatIDs = messageData.memberChatIDs;
         senderName =
           messageData.senderFirstName + " " + messageData.senderLastName;
+        console.log(memberChatIDs);
         if (memberChatIDs.length != 0) {
           if (onlineuser[receiverChatID]) {
             socket.to(receiverChatID).emit(
