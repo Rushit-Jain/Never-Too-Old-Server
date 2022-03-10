@@ -368,7 +368,9 @@ mongoose
           messageData.senderFirstName + " " + messageData.senderLastName;
         console.log(memberChatIDs);
         if (memberChatIDs.length != 0) {
+          console.log("SINGLE CHAT");
           if (onlineuser[receiverChatID]) {
+            console.log(receiverChatID);
             socket.to(receiverChatID).emit(
               "receive_message",
               JSON.stringify({
@@ -404,7 +406,9 @@ mongoose
             }
           }
         } else {
+          console.log("GROUP CHAT");
           memberChatIDs.forEach((m) => {
+            console.log("RECCCCCCC" + m);
             if (onlineuser[m]) {
               socket.to(receiverChatID).emit(
                 "receive_message",
