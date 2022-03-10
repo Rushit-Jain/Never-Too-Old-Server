@@ -410,7 +410,7 @@ mongoose
           memberChatIDs.forEach((m) => {
             console.log("RECCCCCCC" + m);
             if (onlineuser[m]) {
-              socket.to(receiverChatID).emit(
+              socket.to(m).emit(
                 "receive_message",
                 JSON.stringify({
                   timestamp: timestamp,
