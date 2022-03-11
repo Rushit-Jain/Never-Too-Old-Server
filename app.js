@@ -63,6 +63,7 @@ mongoose
     const volunteerSlots = require("./volunteer-slots");
     const elderSlots = require("./elder-slots");
     volunteerSlots.initialize();
+    ElderSlots.initialize();
 
     io.on("connection", (socket) => {
       chatId = socket.handshake.headers.userid;
