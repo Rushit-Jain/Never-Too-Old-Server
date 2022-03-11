@@ -16,7 +16,7 @@ module.exports = {
     console.log(elderSlots);
     return elderSlots.indexOf(id.toString()) != -1;
   },
-  initialize: () => {
+  initialize: async () => {
     let temp = await ElderSlots.find({}).lean();
     elderSlots = temp.map((t) => t.meetID.toString());
     console.log(elderSlots);
