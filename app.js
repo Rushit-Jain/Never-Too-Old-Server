@@ -11,6 +11,8 @@ const messageRoutes = require("./routes/messageRoutes");
 const meetRoutes = require("./routes/meetRoutes");
 const callRoutes = require("./routes/callRoutes");
 const volunteerRoutes = require("./routes/volunteerRoutes");
+const miscellaneousRoutes = require("./routes/miscellaneousRoutes");
+app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use(bodyParser.json({ limit: "50mb" }));
 
 app.use((req, res, next) => {
@@ -34,6 +36,7 @@ app.use("/users", usersRoutes);
 app.use("/messages", messageRoutes);
 app.use("/meet", meetRoutes);
 app.use("/volunteer", volunteerRoutes);
+app.use("/miscellaneous", miscellaneousRoutes);
 
 app.use((error, req, res, next) => {
   if (res.headersSent) {
