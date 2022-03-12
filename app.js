@@ -91,6 +91,22 @@ mongoose
       //     delete offlineMsgs[chatId];
       // });
       socket.on("first_emit", (data) => {
+        const withTimeout = (onSuccess, onTimeout, timeout) => {
+          let called = false;
+
+          const timer = setTimeout(() => {
+            if (called) return;
+            called = true;
+            onTimeout();
+          }, timeout);
+
+          return (...args) => {
+            if (called) return;
+            called = true;
+            clearTimeout(timer);
+            onSuccess.apply(this, args);
+          };
+        };
         jsonData = JSON.parse(data);
         // console.log(typeof jsonData.loggingIN);
         if (offlineMsgs.hasOwnProperty(chatId)) {
@@ -98,7 +114,7 @@ mongoose
             delete offlineMsgs[chatId];
           } else {
             offlineMsgs[chatId].forEach((e) => {
-              io.in(chatId).emit(
+              io.sockets.sockets[onlineuser[chatId]].emit(
                 "receive_message",
                 JSON.stringify({
                   timestamp: e["timestamp"],
@@ -106,7 +122,38 @@ mongoose
                   senderChatID: e["senderChatID"],
                   receiverChatID: e["receiverChatID"],
                   senderName: e["senderName"],
-                })
+                }),
+                withTimeout(
+                  () => {
+                    console.log("success!");
+                  },
+                  () => {
+                    console.log("err");
+                    if (offlineMsgs.hasOwnProperty(receiverChatID)) {
+                      offlineMsgs[receiverChatID] = [
+                        ...offlineMsgs[receiverChatID],
+                        {
+                          timestamp: timestamp,
+                          message: message,
+                          senderChatID: senderChatID,
+                          receiverChatID: receiverChatID,
+                          senderName: senderName,
+                        },
+                      ];
+                    } else {
+                      offlineMsgs[receiverChatID] = [
+                        {
+                          timestamp: timestamp,
+                          message: message,
+                          senderChatID: senderChatID,
+                          receiverChatID: receiverChatID,
+                          senderName: senderName,
+                        },
+                      ];
+                    }
+                  },
+                  1000
+                )
               );
             });
             delete offlineMsgs[chatId];
