@@ -362,6 +362,23 @@ mongoose
 
       //Send message to only a particular user
       socket.on("send_message", (messageData) => {
+        const withTimeout = (onSuccess, onTimeout, timeout) => {
+          let called = false;
+
+          const timer = setTimeout(() => {
+            if (called) return;
+            called = true;
+            onTimeout();
+          }, timeout);
+
+          return (...args) => {
+            if (called) return;
+            called = true;
+            clearTimeout(timer);
+            onSuccess.apply(this, args);
+          };
+        };
+
         messageData = JSON.parse(messageData);
         timestamp = messageData.timestamp;
         message = messageData.text;
@@ -383,7 +400,38 @@ mongoose
                 senderChatID: senderChatID,
                 receiverChatID: receiverChatID,
                 senderName: senderName,
-              })
+              }),
+              withTimeout(
+                () => {
+                  console.log("success!");
+                },
+                () => {
+                  console.log("err");
+                  if (offlineMsgs.hasOwnProperty(receiverChatID)) {
+                    offlineMsgs[receiverChatID] = [
+                      ...offlineMsgs[receiverChatID],
+                      {
+                        timestamp: timestamp,
+                        message: message,
+                        senderChatID: senderChatID,
+                        receiverChatID: receiverChatID,
+                        senderName: senderName,
+                      },
+                    ];
+                  } else {
+                    offlineMsgs[receiverChatID] = [
+                      {
+                        timestamp: timestamp,
+                        message: message,
+                        senderChatID: senderChatID,
+                        receiverChatID: receiverChatID,
+                        senderName: senderName,
+                      },
+                    ];
+                  }
+                },
+                1000
+              )
             );
           } else {
             if (offlineMsgs.hasOwnProperty(receiverChatID)) {
