@@ -392,7 +392,7 @@ mongoose
           console.log("SINGLE CHAT");
           if (onlineuser[receiverChatID]) {
             console.log(receiverChatID);
-            socket.to(receiverChatID).emit(
+            io.sockets.sockets[onlineuser[receiverChatID]].emit(
               "receive_message",
               JSON.stringify({
                 timestamp: timestamp,
