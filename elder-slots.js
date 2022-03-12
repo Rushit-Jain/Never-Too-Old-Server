@@ -4,12 +4,12 @@ let elderSlots = [];
 
 module.exports = {
   addSlot: async (id) => {
-    await new ElderSlots({ meetID: id }).save();
+    new ElderSlots({ meetID: id }).save();
     elderSlots.push(id.toString());
   },
   removeSlot: async (id) => {
-    await ElderSlots.findOneAndRemove({ meetID: id });
     elderSlots = elderSlots.filter((s) => s !== id);
+    ElderSlots.findOneAndRemove({ meetID: id });
   },
   getElderSlots: () => elderSlots,
   isSlotPresent: (id) => {
