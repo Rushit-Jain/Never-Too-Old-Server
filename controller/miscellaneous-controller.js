@@ -82,7 +82,7 @@ exports.sendFile = async (req, res, next) => {
       ],
     };
     const result = await transport.sendMail(mailOptions);
-    return result;
+    return res.json(result);
   } catch (err) {
     return next(err);
   }
