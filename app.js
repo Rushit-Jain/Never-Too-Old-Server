@@ -12,7 +12,7 @@ const meetRoutes = require("./routes/meetRoutes");
 const callRoutes = require("./routes/callRoutes");
 const volunteerRoutes = require("./routes/volunteerRoutes");
 const miscellaneousRoutes = require("./routes/miscellaneousRoutes");
-app.use("/uploads", express.static(__dirname + "/uploads"));
+app.use("/uploads", express.static(process.cwd() + "/uploads"));
 app.use(bodyParser.json({ limit: "50mb" }));
 
 app.use((req, res, next) => {
