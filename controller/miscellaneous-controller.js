@@ -59,7 +59,6 @@ exports.sendFile = async (req, res, next) => {
     //     console.log("Server is ready to take our messages");
     //   }
     // });
-    console.log(req.file);
     const mailOptions = {
       from: "Never Too Old <nevertoooldapp@gmail.com>",
       to: [
