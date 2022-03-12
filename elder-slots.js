@@ -4,8 +4,8 @@ let elderSlots = [];
 
 module.exports = {
   addSlot: async (id) => {
-    new ElderSlots({ meetID: id }).save();
     elderSlots.push(id.toString());
+    new ElderSlots({ meetID: id }).save();
   },
   removeSlot: async (id) => {
     elderSlots = elderSlots.filter((s) => s !== id);
