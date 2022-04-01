@@ -4,7 +4,7 @@ module.exports = {
   initServer: (httpServer) => {
     io = require("socket.io")(httpServer, {
       cors: {
-        origin: "http://never-too-old-server.herokuapp.com:" + process.env.PORT,
+        origin: "192.168.0.105:5000",
         // origin: "192.168.0.112:5000",
         methods: ["GET", "POST"],
       },
