@@ -65,9 +65,22 @@ const volunteerSchema = new Schema({
     },
   ],
   slots: {
-    type: Map,
-    of: Array,
-  },
+    morning: [
+      {
+        type: String,
+      },
+    ],
+    afternoon: [
+      {
+        type: String,
+      },
+    ],
+    evening: [
+      {
+        type: String,
+      },
+    ],
+  }
 });
 
 module.exports = mongoose.model("Volunteer", volunteerSchema);

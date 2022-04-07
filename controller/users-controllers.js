@@ -35,14 +35,16 @@ const checkUser = async (req, res, next) => {
       ).populate([
         {
           path: "friends",
-          select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
+          select: ["phoneNumber", "firstName", "lastName", "profilePicture", "gender", "interests", "birthDay",
+            "birthMonth", "birthYear"],
         },
         {
           path: "volunteers",
-          select: ["phoneNumber", "firstName", "lastName", "profilePicture"],
+          select: ["phoneNumber", "firstName", "lastName", "profilePicture", "gender", "birthDay", "birthMonth",
+            "birthYear"],
         },
       ]);
-      // console.log(friendsdata);
+      console.log(friendsdata);
       groupsdata = await Elder.find(
         { phoneNumber: req.body.number },
         { groups: 1, _id: 0 }
@@ -213,7 +215,7 @@ const updateLocation = async (req, res, next) => {
           },
         },
       },
-      { _id: 1, firstName: 1, lastName: 1, profilePicture: 1 }
+      { _id: 1, firstName: 1, lastName: 1, profilePicture: 1, gender: 1 }
     );
     // console.log("HEY there" + new_volunteers);
 
