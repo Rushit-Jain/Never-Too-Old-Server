@@ -215,7 +215,7 @@ const updateLocation = async (req, res, next) => {
           },
         },
       },
-      { _id: 1, firstName: 1, lastName: 1, profilePicture: 1 }
+      { _id: 1, firstName: 1, lastName: 1, profilePicture: 1, gender: 1 }
     );
     // console.log("HEY there" + new_volunteers);
 

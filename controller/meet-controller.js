@@ -96,6 +96,7 @@ exports.bookMeet = async (req, res, next) => {
   const { elder, date, startTime, meetType, endTime, volunteer, meetStatus } =
     req.body;
   let timeOfDay = req.body.timeOfDay.split(".")[1].toLowerCase();
+  console.log("TIMEOFDAY /*/*/*/*/*/*/*" + timeOfDay);
   const createdMeet = new TimeSlot({
     elder: elder,
     volunteer: volunteer,
@@ -106,16 +107,20 @@ exports.bookMeet = async (req, res, next) => {
     meetStatus: meetStatus,
     acceptanceStatus: true,
   });
+  console.log("Meet-Controller createdMEET/*/*/*/*/*/*/*/*/*/*" + createdMeet);
   try {
     let volunteerFromDb = await Volunteer.findById(volunteer);
     console.log(volunteerFromDb);
     let slots = volunteerFromDb.slots;
-    let updatedSlots = slots.get(timeOfDay);
+    let updatedSlots = slots[timeOfDay];
+    console.log("Meet-controller: updatedSLots /*/*/*/**/*" + updatedSlots);
+    console.log("Meet-controller: REQ.BODY.SLOT /*/*/*/**/*" + req.body.slot);
+
     updatedSlots = updatedSlots.filter(
       (e) => e.localeCompare(req.body.slot) != 0
     );
-    console.log(updatedSlots);
-    slots.set(timeOfDay, updatedSlots);
+    console.log("llll1111" + updatedSlots);
+    slots[timeOfDay] = updatedSlots;
     await Volunteer.findByIdAndUpdate(volunteer, { slots: slots });
     createdMeet
       .save()
@@ -207,7 +212,7 @@ exports.getUpcomingMeets = async (req, res, next) => {
       let year = e.date.split("-")[0].trim();
       let ampm = e.startTime
         .split(" ")
-        [e.startTime.split(" ").length - 1].trim();
+      [e.startTime.split(" ").length - 1].trim();
       let hour = e.startTime.split(":")[0].trim();
       let min = e.startTime.split(":")[1].trim().split(" ")[0].trim();
       if (min.length == 1) min = "0" + min;
@@ -252,6 +257,15 @@ exports.getNearbyVolunteers = async (req, res, next) => {
   try {
     volunteers = await Volunteer.find(
       {
+
+        $or: [
+
+          { 'slots.morning': { $ne: [] } },
+          { 'slots.afternoon': { $ne: [] } },
+          { 'slots.evening': { $ne: [] } },
+
+        ],
+
         location: {
           $near: {
             $geometry: {
@@ -263,8 +277,9 @@ exports.getNearbyVolunteers = async (req, res, next) => {
           },
         },
       },
-      { document: 0 }
+      { document: 0, groups: 0, elders: 0 }
     );
+    // console.log('sdasdasdas' + volunteers);
     res.status(201).json(volunteers);
   } catch (e) {
     console.log(e);
