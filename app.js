@@ -152,7 +152,7 @@ mongoose
                       ];
                     }
                   },
-                  1000
+                  2000
                 )
               );
             });
@@ -191,25 +191,26 @@ mongoose
         });
       });
 
-      socket.on("joining_group_room", (jsonData) => {
-        jsonData = JSON.parse(jsonData);
-        // console.log("uhduhuhuehudbdbfubybyeybdyhb" + jsonData);
-        jsonData.groupIDs.forEach((element) => {
-          socket.join(element);
-        });
-      });
+      // joining groups id
+      // socket.on("joining_group_room", (jsonData) => {
+      //   jsonData = JSON.parse(jsonData);
+      //   // console.log("uhduhuhuehudbdbfubybyeybdyhb" + jsonData);
+      //   jsonData.groupIDs.forEach((element) => {
+      //     socket.join(element);
+      //   });
+      // });
 
-      socket.on("join_all_groups", (groupIDs) => {
-        groupIDs = JSON.parse(groupIDs);
-        // console.log(
-        //   "uhduhuhuehudbdbfubybyeybdyhb77777777777777777777777777777777777" +
-        //     groupIDs
-        // );
-        // console.log(groupIDs);
-        groupIDs.groupIDs.forEach((element) => {
-          socket.join(element);
-        });
-      });
+      // socket.on("join_all_groups", (groupIDs) => {
+      //   groupIDs = JSON.parse(groupIDs);
+      //   // console.log(
+      //   //   "uhduhuhuehudbdbfubybyeybdyhb77777777777777777777777777777777777" +
+      //   //     groupIDs
+      //   // );
+      //   // console.log(groupIDs);
+      //   groupIDs.groupIDs.forEach((element) => {
+      //     socket.join(element);
+      //   });
+      // });
 
       socket.on("video_call_invite", (jsonData) => {
         jsonData = JSON.parse(jsonData);
@@ -438,6 +439,13 @@ mongoose
         if (memberChatIDs.length == 0) {
           console.log("SINGLE CHAT");
           if (onlineuser[receiverChatID]) {
+            console.log("Single Chat Psadasdasjdaskjd" + JSON.stringify({
+              timestamp: timestamp,
+              message: message,
+              senderChatID: senderChatID,
+              receiverChatID: receiverChatID,
+              senderName: senderName,
+            }));
             console.log(receiverChatID);
             io.sockets.sockets[onlineuser[receiverChatID]].emit(
               "receive_message",
@@ -477,7 +485,7 @@ mongoose
                     ];
                   }
                 },
-                1000
+                2000
               )
             );
           } else {
@@ -509,7 +517,8 @@ mongoose
           memberChatIDs.forEach((m) => {
             console.log("RECCCCCCC" + m);
             if (onlineuser[m]) {
-              socket.to(m).emit(
+              console.log("Testing!!!!");
+              io.sockets.sockets[onlineuser[m]].emit(
                 "receive_message",
                 JSON.stringify({
                   timestamp: timestamp,
@@ -517,7 +526,38 @@ mongoose
                   senderChatID: senderChatID,
                   receiverChatID: receiverChatID,
                   senderName: senderName,
-                })
+                }),
+                withTimeout(
+                  () => {
+                    console.log("success!");
+                  },
+                  () => {
+                    console.log("err");
+                    if (offlineMsgs.hasOwnProperty(m)) {
+                      offlineMsgs[m] = [
+                        ...offlineMsgs[m],
+                        {
+                          timestamp: timestamp,
+                          message: message,
+                          senderChatID: senderChatID,
+                          receiverChatID: receiverChatID,
+                          senderName: senderName,
+                        },
+                      ];
+                    } else {
+                      offlineMsgs[m] = [
+                        {
+                          timestamp: timestamp,
+                          message: message,
+                          senderChatID: senderChatID,
+                          receiverChatID: receiverChatID,
+                          senderName: senderName,
+                        },
+                      ];
+                    }
+                  },
+                  2000
+                )
               );
             } else {
               if (offlineMsgs.hasOwnProperty(m)) {
@@ -563,7 +603,7 @@ mongoose
         //Send message to only that particular room
         // socket.broadcast.emit("test", "test");
         console.log();
-        socket.join(_id);
+        // socket.join(_id);
         console.log(
           "fmkmikmnkdnknjnjnfjnuddddddddddddddddddddddddddddddddddddddddd"
         );

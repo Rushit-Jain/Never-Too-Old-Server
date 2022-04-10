@@ -56,9 +56,9 @@ exports.getMeet = async (req, res, next) => {
       temp.volunteerName = volunteerNames[e["volunteer"]];
       return temp;
     });
+    // console.log(meet);
     res.json(meet);
   } catch (e) {
-    console.log(e);
     const err = new HttpError(e.message, 500);
     return next(err);
   }
