@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const HttpError = require('../models/http-error');
-const Message = require('../models/message-model');
+const HttpError = require("../models/http-error");
+const Message = require("../models/message-model");
 
 exports.saveMessages = async (req, res, next) => {
   let msg = req.body;
@@ -9,14 +9,17 @@ exports.saveMessages = async (req, res, next) => {
       timestamp: msg.timestamp,
       message: msg.text,
       senderChatID: msg.senderChatID,
-      receiverChatID: msg.receiverChatID
+      receiverChatID: msg.receiverChatID,
     });
-    message.save().then(response => res.json(message)).catch(err => console.log(err));
-    console.log(message);
+    message
+      .save()
+      .then((response) => res.json(message))
+      .catch((err) => console.log(err));
+    console.log("Meesage COntroller" + message);
   } catch (err) {
     return;
   }
-}
+};
 
 exports.getMessages = async (req, res, next) => {
   try {
@@ -37,8 +40,7 @@ exports.getMessages = async (req, res, next) => {
         receiverChatID: userId1,
       });
       messages = [...messages1, ...messages2];
-    }
-    else {
+    } else {
       messages = await Message.find({
         receiverChatID: userId2,
       });
@@ -50,15 +52,18 @@ exports.getMessages = async (req, res, next) => {
     const err = new HttpError(e.message, 500);
     return next(err);
   }
-}
+};
 exports.getAllMessages = async (req, res, next) => {
   try {
     var messages;
     console.log(req.query.senderChatID);
     const userId1 = req.query.senderChatID;
-    messages = await Message.find({
-      $or: [{ senderChatID: userId1 }, { receiverChatID: userId1 }],
-    }, { __v: 0 });
+    messages = await Message.find(
+      {
+        $or: [{ senderChatID: userId1 }, { receiverChatID: userId1 }],
+      },
+      { __v: 0 }
+    );
     messages.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
     console.log(messages);
     res.json(messages);
@@ -66,4 +71,4 @@ exports.getAllMessages = async (req, res, next) => {
     const err = new HttpError(e.message, 500);
     return next(err);
   }
-}
+};

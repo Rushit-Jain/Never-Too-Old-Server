@@ -212,7 +212,7 @@ exports.getUpcomingMeets = async (req, res, next) => {
       let year = e.date.split("-")[0].trim();
       let ampm = e.startTime
         .split(" ")
-      [e.startTime.split(" ").length - 1].trim();
+        [e.startTime.split(" ").length - 1].trim();
       let hour = e.startTime.split(":")[0].trim();
       let min = e.startTime.split(":")[1].trim().split(" ")[0].trim();
       if (min.length == 1) min = "0" + min;
@@ -232,6 +232,7 @@ exports.getUpcomingMeets = async (req, res, next) => {
       var dateNow = new Date();
       return dateNow.getTime() <= dateThen.getTime();
     });
+    console.log(upcomingMeets);
     res.status(201).json(upcomingMeets);
   } catch (e) {
     console.log(e);
@@ -257,13 +258,10 @@ exports.getNearbyVolunteers = async (req, res, next) => {
   try {
     volunteers = await Volunteer.find(
       {
-
         $or: [
-
-          { 'slots.morning': { $ne: [] } },
-          { 'slots.afternoon': { $ne: [] } },
-          { 'slots.evening': { $ne: [] } },
-
+          { "slots.morning": { $ne: [] } },
+          { "slots.afternoon": { $ne: [] } },
+          { "slots.evening": { $ne: [] } },
         ],
 
         location: {
