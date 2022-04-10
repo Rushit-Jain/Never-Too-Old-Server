@@ -35,13 +35,30 @@ const checkUser = async (req, res, next) => {
       ).populate([
         {
           path: "friends",
-          select: ["phoneNumber", "firstName", "lastName", "profilePicture", "gender", "interests", "birthDay",
-            "birthMonth", "birthYear"],
+          select: [
+            "phoneNumber",
+            "firstName",
+            "lastName",
+            "profilePicture",
+            "gender",
+            "interests",
+            "birthDay",
+            "birthMonth",
+            "birthYear",
+          ],
         },
         {
           path: "volunteers",
-          select: ["phoneNumber", "firstName", "lastName", "profilePicture", "gender", "birthDay", "birthMonth",
-            "birthYear"],
+          select: [
+            "phoneNumber",
+            "firstName",
+            "lastName",
+            "profilePicture",
+            "gender",
+            "birthDay",
+            "birthMonth",
+            "birthYear",
+          ],
         },
       ]);
       console.log(friendsdata);
@@ -198,7 +215,18 @@ const updateLocation = async (req, res, next) => {
           },
         },
       },
-      { _id: 1, firstName: 1, lastName: 1, interests: 1, profilePicture: 1, gender: 1 }
+      {
+        _id: 1,
+        firstName: 1,
+        lastName: 1,
+        interests: 1,
+        profilePicture: 1,
+        gender: 1,
+        phoneNumber: 1,
+        birthDay: 1,
+        birthMonth: 1,
+        birthYear: 1,
+      }
     );
 
     let new_volunteers = await Volunteer.find(
@@ -215,7 +243,17 @@ const updateLocation = async (req, res, next) => {
           },
         },
       },
-      { _id: 1, firstName: 1, lastName: 1, profilePicture: 1, gender: 1 }
+      {
+        _id: 1,
+        firstName: 1,
+        lastName: 1,
+        profilePicture: 1,
+        gender: 1,
+        phoneNumber: 1,
+        birthDay: 1,
+        birthMonth: 1,
+        birthYear: 1,
+      }
     );
     // console.log("HEY there" + new_volunteers);
 
@@ -241,7 +279,15 @@ const updateLocation = async (req, res, next) => {
         countOccurrences(bitwiseorlist, true);
       // console.log(similarity);
       jaccard_indexes.push(similarity);
-      friendswithsimilarity.push({ "_id": new_friends[i]._id, "firstName": new_friends[i].firstName, "lastName": new_friends[i].lastName, "profilePicture": new_friends[i].profilePicture, "interests": new_friends[i].interests, "similarity": Math.round(similarity * 100) / 100, "gender": new_friends[i].gender });
+      friendswithsimilarity.push({
+        _id: new_friends[i]._id,
+        firstName: new_friends[i].firstName,
+        lastName: new_friends[i].lastName,
+        profilePicture: new_friends[i].profilePicture,
+        interests: new_friends[i].interests,
+        similarity: Math.round(similarity * 100) / 100,
+        gender: new_friends[i].gender,
+      });
       // friendswithsimilarity[i].similarity = similarity;
       // new_friends[i].similarity = similarity;
     }
@@ -251,7 +297,10 @@ const updateLocation = async (req, res, next) => {
     // console.log("s", friendswithsimilarity);
     res
       .status(201)
-      .json({ new_friends: friendswithsimilarity, new_volunteers: new_volunteers });
+      .json({
+        new_friends: friendswithsimilarity,
+        new_volunteers: new_volunteers,
+      });
   } catch (err) {
     const error = new HttpError(
       "Signing up failed, please try again later.",
