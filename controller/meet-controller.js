@@ -39,6 +39,7 @@ exports.getMeet = async (req, res, next) => {
   try {
     var meet;
     const userId = req.query.userId;
+    console.log(userId);
     meet = await TimeSlot.find({
       elder: userId,
     }).lean();
@@ -56,7 +57,7 @@ exports.getMeet = async (req, res, next) => {
       temp.volunteerName = volunteerNames[e["volunteer"]];
       return temp;
     });
-    // console.log(meet);
+    console.log(meet);
     res.json(meet);
   } catch (e) {
     const err = new HttpError(e.message, 500);
@@ -68,9 +69,12 @@ exports.getVolunteerMeets = async (req, res, next) => {
   try {
     var meet;
     const userId = req.query.userId;
+    console.log(userId);
+
     meet = await TimeSlot.find({
       volunteer: userId,
     }).lean();
+
     meetIds = meet.map((e) => e.elder);
     var elders = await Elder.find(
       { _id: { $in: meetIds } },
@@ -212,7 +216,7 @@ exports.getUpcomingMeets = async (req, res, next) => {
       let year = e.date.split("-")[0].trim();
       let ampm = e.startTime
         .split(" ")
-        [e.startTime.split(" ").length - 1].trim();
+      [e.startTime.split(" ").length - 1].trim();
       let hour = e.startTime.split(":")[0].trim();
       let min = e.startTime.split(":")[1].trim().split(" ")[0].trim();
       if (min.length == 1) min = "0" + min;

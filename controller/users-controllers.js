@@ -285,13 +285,17 @@ const updateLocation = async (req, res, next) => {
         lastName: new_friends[i].lastName,
         profilePicture: new_friends[i].profilePicture,
         interests: new_friends[i].interests,
-        similarity: Math.round(similarity * 100) / 100,
         gender: new_friends[i].gender,
+        phoneNumber: new_friends[i].phoneNumber,
+        birthDay: new_friends[i].birthDay,
+        birthMonth: new_friends[i].birthMonth,
+        birthYear: new_friends[i].birthYear,
+        similarity: Math.round(similarity * 100) / 100,
       });
       // friendswithsimilarity[i].similarity = similarity;
       // new_friends[i].similarity = similarity;
     }
-    // console.log("sssssssssssssokodkdmk", new_friends);
+    console.log("sssssssssssssokodkdmk", new_friends);
     friendswithsimilarity.sort((a, b) => b.similarity - a.similarity);
 
     // console.log("s", friendswithsimilarity);
