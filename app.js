@@ -316,6 +316,11 @@ mongoose
             firstName: friendData.firstName,
             lastName: friendData.lastName,
             profilePicture: friendData.profilePicture,
+            gender: friendData.gender,
+            birthDay: friendData.birthDay,
+            birthMonth: friendData.birthMonth,
+            birthYear: friendData.birthYear,
+            interests: friendData.interests
           })
         );
       });
@@ -331,6 +336,10 @@ mongoose
             firstName: volunteerData.firstName,
             lastName: volunteerData.lastName,
             profilePicture: volunteerData.profilePicture,
+            gender: volunteerData.gender,
+            birthDay: volunteerData.birthDay,
+            birthMonth: volunteerData.birthMonth,
+            birthYear: volunteerData.birthYear,
           })
         );
       });
