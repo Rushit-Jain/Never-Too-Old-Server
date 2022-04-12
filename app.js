@@ -448,14 +448,14 @@ mongoose
         if (memberChatIDs.length == 0) {
           console.log("SINGLE CHAT");
           if (onlineuser[receiverChatID]) {
-            console.log("Single Chat Psadasdasjdaskjd" + JSON.stringify({
-              timestamp: timestamp,
-              message: message,
-              senderChatID: senderChatID,
-              receiverChatID: receiverChatID,
-              senderName: senderName,
-            }));
-            console.log(receiverChatID);
+            // console.log("Single Chat Psadasdasjdaskjd" + JSON.stringify({
+            //   timestamp: timestamp,
+            //   message: message,
+            //   senderChatID: senderChatID,
+            //   receiverChatID: receiverChatID,
+            //   senderName: senderName,
+            // }));
+            // console.log(receiverChatID);
             io.sockets.sockets[onlineuser[receiverChatID]].emit(
               "receive_message",
               JSON.stringify({
@@ -524,7 +524,7 @@ mongoose
         } else {
           console.log("GROUP CHAT");
           memberChatIDs.forEach((m) => {
-            console.log("RECCCCCCC" + m);
+            // console.log("RECCCCCCC" + m);
             if (onlineuser[m]) {
               console.log("Testing!!!!");
               io.sockets.sockets[onlineuser[m]].emit(
@@ -602,22 +602,22 @@ mongoose
       socket.on("creating_group", (newGroupData) => {
         // console.log(message);
         newGroupData = JSON.parse(newGroupData);
-        console.log(newGroupData);
+        // console.log(newGroupData);
         _id = newGroupData._id;
         groupName = newGroupData.groupName;
         timestamp = newGroupData.timestamp;
         memberChatIDs = newGroupData.memberChatIDs;
         creatorChatID = newGroupData.receiverChatID;
-        console.log(memberChatIDs);
+        // console.log(memberChatIDs);
         //Send message to only that particular room
         // socket.broadcast.emit("test", "test");
-        console.log();
+        // console.log();
         // socket.join(_id);
-        console.log(
-          "fmkmikmnkdnknjnjnfjnuddddddddddddddddddddddddddddddddddddddddd"
-        );
+        // console.log(
+        //   "fmkmikmnkdnknjnjnfjnuddddddddddddddddddddddddddddddddddddddddd"
+        // );
         memberChatIDs.forEach((element) => {
-          console.log(element);
+          // console.log(element);
           socket.to(element).emit(
             "inviting_to_group",
             JSON.stringify({

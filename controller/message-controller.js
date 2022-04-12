@@ -15,7 +15,7 @@ exports.saveMessages = async (req, res, next) => {
       .save()
       .then((response) => res.json(message))
       .catch((err) => console.log(err));
-    console.log("Meesage COntroller" + message);
+    // console.log("Meesage COntroller" + message);
   } catch (err) {
     return;
   }
@@ -46,7 +46,7 @@ exports.getMessages = async (req, res, next) => {
       });
     }
     messages.sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
-    console.log(messages);
+    // console.log(messages);
     res.json(messages);
   } catch (e) {
     const err = new HttpError(e.message, 500);
