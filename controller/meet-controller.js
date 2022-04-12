@@ -141,6 +141,7 @@ exports.getLatestMeets = async (req, res, next) => {
   try {
     let elders = await Elder.find(
       {
+        acceptanceStatus: false,
         location: {
           $near: {
             $geometry: {
